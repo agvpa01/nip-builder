@@ -65,10 +65,26 @@ function generateCompleteHTML(productData: any, baseHtml: string): string {
   // Generate the NIP content HTML based on the template and region
   let nipContent = "";
 
-  if (region === "US" && template === "supplements") {
-    nipContent = generateUSSupplementsHTML(productData);
-  } else if (region === "AU" && template === "complex") {
-    nipContent = generateAUComplexHTML(productData);
+  if (region === "US") {
+    if (template === "supplements") {
+      nipContent = generateUSSupplementsHTML(productData);
+    } else if (template === "protein") {
+      nipContent = generateUSProteinHTML(productData);
+    } else if (template === "complex") {
+      nipContent = generateUSComplexHTML(productData);
+    } else {
+      nipContent = generateUSDefaultHTML(productData);
+    }
+  } else if (region === "AU") {
+    if (template === "protein") {
+      nipContent = generateAUProteinHTML(productData);
+    } else if (template === "supplements") {
+      nipContent = generateAUSupplementsHTML(productData);
+    } else if (template === "complex") {
+      nipContent = generateAUComplexHTML(productData);
+    } else {
+      nipContent = generateAUDefaultHTML(productData);
+    }
   } else {
     nipContent = generateDefaultHTML(productData);
   }
@@ -186,96 +202,863 @@ function generateAUComplexHTML(productData: any): string {
     servingScoopInfo,
     nutritionalData,
     compositionalData,
+    consumptionWarning,
+    nutritionalItems,
+    template,
   } = productData;
+
+  const getBorderThickness = (thickness: string = "light") => {
+    const thicknessMap: { [key: string]: string } = {
+      light: "1px solid black",
+      medium: "2px solid black",
+      large: "3px solid black",
+      xl: "4px solid black",
+      "2xl": "5px solid black",
+    };
+    return thicknessMap[thickness] || "1px solid black";
+  };
+
+  const thickBorderStyle = "5px solid black";
 
   return `
     <div class="max-w-2xl mx-auto bg-white text-black p-8 font-sans text-sm leading-tight">
-      <div class="border-2 border-black mb-4">
-        <h2 class="bg-black text-white p-2 text-center font-bold">NUTRITION INFORMATION</h2>
-        <div class="p-4">
-          <div class="mb-2">
-            <span class="font-bold">Serving Size:</span> ${servingSize}
+      <div class="grid gap-8 w-full grid-cols-1">
+        <div class="w-full">
+          <div class="w-full">
+            <div class="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-sm">
+              NUTRITIONAL INFORMATION
+            </div>
+            <table class="w-full border-collapse">
+              <tbody>
+                <tr style="border-bottom: ${thickBorderStyle}">
+                  <td class="py-1 px-2">
+                    Serving Size: ${nutritionalData.servingSize}
+                  </td>
+                  <td></td>
+                  <td class="py-1 px-2 text-right">
+                    Servings per Bottle: ${nutritionalData.servingsPerPack}
+                  </td>
+                </tr>
+                <tr style="border-bottom: 1px solid black">
+                  <td class="py-1 px-2"></td>
+                  <td class="py-1 px-2 font-normal text-xs text-right w-32">
+                    Per Serve
+                  </td>
+                  <td class="py-1 px-2 text-center font-normal text-xs">
+                    Per 100g
+                  </td>
+                </tr>
+                ${nutritionalItems ? nutritionalItems.map((item: any) => `
+                  <tr style="border-bottom: ${getBorderThickness(item.borderThickness)}">
+                    <td class="py-1 px-2 ${item.label.includes("Saturated") || item.label.includes("Sugars") ? "italic pl-4" : ""}">
+                      ${item.label}
+                    </td>
+                    <td class="py-1 px-2 text-center">
+                      ${nutritionalData[item.serveKey] || "0"}
+                    </td>
+                    <td class="py-1 px-2 text-center">
+                      ${nutritionalData[item.per100gKey] || "0"}
+                    </td>
+                  </tr>
+                `).join('') : ''}
+                ${compositionalData ? `
+                  <tr>
+                    <td colspan="3" class="bg-black text-white text-center py-2 px-4 font-bold text-base">
+                      COMPOSITIONAL INFORMATION
+                    </td>
+                  </tr>
+                  ${Object.entries(compositionalData).map(([key, data]: [string, any]) => `
+                    <tr style="border-bottom: ${getBorderThickness(data.borderThickness)}">
+                      <td class="py-1 px-2">${key}</td>
+                      <td class="py-1 px-2 text-center">${data.serve}</td>
+                      <td class="py-1 px-2 text-center">${data.per100g}</td>
+                    </tr>
+                  `).join('')}
+                ` : ''}
+              </tbody>
+            </table>
           </div>
-          
-          <table class="w-full border-collapse">
-            <thead>
-              <tr class="border-b-2 border-black">
-                <th class="text-left py-2"></th>
-                <th class="text-center py-2">Per Serve</th>
-                <th class="text-center py-2">Per 100g</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="border-b border-gray-400">
-                <td class="py-1 font-bold">Energy (kJ)</td>
-                <td class="text-center">${
-                  nutritionalData.energy_kj_serve || "0"
-                }</td>
-                <td class="text-center">${
-                  nutritionalData.energy_kj_100g || "0"
-                }</td>
-              </tr>
-              <tr class="border-b border-gray-400">
-                <td class="py-1 font-bold">Energy (Cal)</td>
-                <td class="text-center">${
-                  nutritionalData.energy_cal_serve || "0"
-                }</td>
-                <td class="text-center">${
-                  nutritionalData.energy_cal_100g || "0"
-                }</td>
-              </tr>
-              <tr class="border-b border-gray-400">
-                <td class="py-1">Protein (g)</td>
-                <td class="text-center">${
-                  nutritionalData.protein_serve || "0"
-                }</td>
-                <td class="text-center">${
-                  nutritionalData.protein_100g || "0"
-                }</td>
-              </tr>
-              <tr class="border-b border-gray-400">
-                <td class="py-1">Total Fat (g)</td>
-                <td class="text-center">${nutritionalData.fat_serve || "0"}</td>
-                <td class="text-center">${nutritionalData.fat_100g || "0"}</td>
-              </tr>
-              <tr class="border-b border-gray-400">
-                <td class="py-1">Saturated Fat (g)</td>
-                <td class="text-center">${
-                  nutritionalData.saturated_fat_serve || "0"
-                }</td>
-                <td class="text-center">${
-                  nutritionalData.saturated_fat_100g || "0"
-                }</td>
-              </tr>
-              <tr class="border-b border-gray-400">
-                <td class="py-1">Carbohydrate (g)</td>
-                <td class="text-center">${
-                  nutritionalData.carbs_serve || "0"
-                }</td>
-                <td class="text-center">${
-                  nutritionalData.carbs_100g || "0"
-                }</td>
-              </tr>
-              <tr class="border-b border-gray-400">
-                <td class="py-1">Sugars (g)</td>
-                <td class="text-center">${
-                  nutritionalData.sugars_serve || "0"
-                }</td>
-                <td class="text-center">${
-                  nutritionalData.sugars_100g || "0"
-                }</td>
-              </tr>
-              <tr>
-                <td class="py-1">Sodium (mg)</td>
-                <td class="text-center">${
-                  nutritionalData.sodium_serve || "0"
-                }</td>
-                <td class="text-center">${
-                  nutritionalData.sodium_100g || "0"
-                }</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="space-y-4 mt-6 w-full">
+            <div>
+              <h3 class="font-bold text-base mb-2">INGREDIENTS:</h3>
+              <p class="text-sm">${ingredients}</p>
+            </div>
+            ${consumptionWarning ? `<div class="border-2 border-black text-center py-2 px-4 font-bold text-xs">
+              ${consumptionWarning}
+            </div>` : ''}
+          </div>
+        </div>
+      </div>
+      
+      <div class="mb-4">
+        <h3 class="font-bold mb-2">Directions:</h3>
+        <p>${directions}</p>
+      </div>
+      
+      <div class="mb-4">
+        <h3 class="font-bold mb-2">Ingredients:</h3>
+        <p>${ingredients}</p>
+      </div>
+      
+      <div class="mb-4">
+        <h3 class="font-bold mb-2">Allergen Advice:</h3>
+        <p>${allergenAdvice}</p>
+      </div>
+      
+      <div class="mb-4">
+        <h3 class="font-bold mb-2">Storage:</h3>
+        <p>${storage}</p>
+      </div>
+      
+      <div class="mb-4">
+        <p class="text-xs">${supplementaryInfo}</p>
+      </div>
+      
+      <div>
+        <p class="text-xs font-bold">${servingScoopInfo}</p>
+      </div>
+    </div>
+  `;
+}
+
+function generateUSProteinHTML(productData: any): string {
+  const {
+    product,
+    directions,
+    servingSize,
+    ingredients,
+    allergenAdvice,
+    storage,
+    supplementaryInfo,
+    servingScoopInfo,
+    nutritionalData,
+    nutritionalItems,
+    aminoAcidData,
+    template,
+  } = productData;
+
+  const getBorderThickness = (thickness: string = "light") => {
+    const thicknessMap: { [key: string]: string } = {
+      light: "1px solid black",
+      medium: "2px solid black",
+      large: "3px solid black",
+      xl: "4px solid black",
+      "2xl": "5px solid black",
+    };
+    return thicknessMap[thickness] || "1px solid black";
+  };
+
+  const thickBorderStyle = "5px solid black";
+
+  return `
+    <div class="max-w-2xl mx-auto bg-white text-black p-8 font-sans text-sm leading-tight">
+      <div class="grid gap-8 w-full grid-cols-1">
+        <div class="w-full">
+          <div class="w-full">
+            <div class="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-sm">
+              NUTRITION FACTS
+            </div>
+            <table class="w-full border-collapse">
+              <tbody>
+                <tr style="border-bottom: ${thickBorderStyle}">
+                  <td class="py-1 px-2">
+                    Serving Size: ${nutritionalData.servingSize}
+                  </td>
+                  <td></td>
+                  <td class="py-1 px-2 text-right">
+                    Servings per Container: ${nutritionalData.servingsPerPack}
+                  </td>
+                </tr>
+                <tr style="border-bottom: 1px solid black">
+                  <td class="py-1 px-2"></td>
+                  <td class="py-1 px-2 font-normal text-xs text-right w-32">
+                    Amount Per Serving
+                  </td>
+                  <td class="py-1 px-2 text-center font-normal text-xs">
+                    % Daily Value*
+                  </td>
+                </tr>
+                ${nutritionalItems ? nutritionalItems.map((item: any) => `
+                  <tr style="border-bottom: ${getBorderThickness(item.borderThickness)}">
+                    <td class="py-1 px-2 ${item.label.includes("Saturated") || item.label.includes("Sugars") || item.label.includes("Added") || item.label.includes("Dietary") ? "italic pl-4" : ""}">
+                      ${item.label}
+                    </td>
+                    <td class="py-1 px-2 text-center">
+                      ${nutritionalData[item.serveKey] || "0"}
+                    </td>
+                    <td class="py-1 px-2 text-center">
+                      ${nutritionalData[item.dailyValueKey] || "*"}
+                    </td>
+                  </tr>
+                `).join('') : ''}
+              </tbody>
+            </table>
+            <div class="text-xs mt-2 px-2">
+              * Daily Value not established.
+            </div>
+          </div>
+        </div>
+        ${template === "protein" && aminoAcidData && Object.keys(aminoAcidData).length > 0 ? `
+          <div class="w-full">
+            <div class="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-sm">
+              TYPICAL AMINO ACID PROFILE
+            </div>
+            <table class="w-full border-collapse">
+              <tbody>
+                <tr style="border-bottom: 1px solid black">
+                  <td class="py-1 px-2"></td>
+                  <td class="py-1 px-2 font-normal text-xs text-center">
+                    Per Serve
+                  </td>
+                </tr>
+                ${Object.entries(aminoAcidData).map(([key, data]: [string, any]) => `
+                  <tr style="border-bottom: ${getBorderThickness(data.borderThickness)}">
+                    <td class="py-1 px-2">
+                      ${key}
+                    </td>
+                    <td class="py-1 px-2 text-center">
+                      ${data.value}
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        ` : ''}
+      </div>
+      
+      <div class="mb-4">
+        <h3 class="font-bold mb-2">Directions:</h3>
+        <p>${directions}</p>
+      </div>
+      
+      <div class="mb-4">
+        <h3 class="font-bold mb-2">Ingredients:</h3>
+        <p>${ingredients}</p>
+      </div>
+      
+      <div class="mb-4">
+        <h3 class="font-bold mb-2">Allergen Advice:</h3>
+        <p>${allergenAdvice}</p>
+      </div>
+      
+      <div class="mb-4">
+        <h3 class="font-bold mb-2">Storage:</h3>
+        <p>${storage}</p>
+      </div>
+      
+      <div class="mb-4">
+        <p class="text-xs">${supplementaryInfo}</p>
+      </div>
+      
+      <div>
+        <p class="text-xs font-bold">${servingScoopInfo}</p>
+      </div>
+    </div>
+  `;
+}
+
+function generateUSComplexHTML(productData: any): string {
+  const {
+    product,
+    directions,
+    servingSize,
+    ingredients,
+    allergenAdvice,
+    storage,
+    supplementaryInfo,
+    servingScoopInfo,
+    nutritionalData,
+    nutritionalItems,
+    compositionalData,
+    consumptionWarning,
+    template,
+  } = productData;
+
+  const getBorderThickness = (thickness: string = "light") => {
+    const thicknessMap: { [key: string]: string } = {
+      light: "1px solid black",
+      medium: "2px solid black",
+      large: "3px solid black",
+      xl: "4px solid black",
+      "2xl": "5px solid black",
+    };
+    return thicknessMap[thickness] || "1px solid black";
+  };
+
+  const thickBorderStyle = "5px solid black";
+
+  return `
+    <div class="max-w-2xl mx-auto bg-white text-black p-8 font-sans text-sm leading-tight">
+      <div class="grid gap-8 w-full grid-cols-1">
+        <div class="w-full">
+          <div class="w-full">
+            <div class="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-sm">
+              SUPPLEMENT FACTS
+            </div>
+            <table class="w-full border-collapse">
+              <tbody>
+                <tr style="border-bottom: ${thickBorderStyle}">
+                  <td class="py-1 px-2">
+                    Serving Size: ${nutritionalData.servingSize}
+                  </td>
+                  <td></td>
+                  <td class="py-1 px-2 text-right">
+                    Servings per Container: ${nutritionalData.servingsPerPack}
+                  </td>
+                </tr>
+                <tr style="border-bottom: 1px solid black">
+                  <td class="py-1 px-2"></td>
+                  <td class="py-1 px-2 font-normal text-xs text-right w-32">
+                    Amount Per Serving
+                  </td>
+                  <td class="py-1 px-2 text-center font-normal text-xs">
+                    % Daily Value*
+                  </td>
+                </tr>
+                ${nutritionalItems ? nutritionalItems.map((item: any) => `
+                  <tr style="border-bottom: ${getBorderThickness(item.borderThickness)}">
+                    <td class="py-1 px-2 ${item.label.includes("Saturated") || item.label.includes("Sugars") || item.label.includes("Added") || item.label.includes("Dietary") ? "italic pl-4" : ""}">
+                      ${item.label}
+                    </td>
+                    <td class="py-1 px-2 text-center">
+                      ${nutritionalData[item.serveKey] || "0"}
+                    </td>
+                    <td class="py-1 px-2 text-center">
+                      ${nutritionalData[item.dailyValueKey] || "*"}
+                    </td>
+                  </tr>
+                `).join('') : ''}
+              </tbody>
+            </table>
+            <div class="text-xs mt-2 px-2">
+              * Daily Value not established.
+            </div>
+          </div>
+        </div>
+        ${template === "complex" && compositionalData && Object.keys(compositionalData).length > 0 ? `
+          <div class="w-full">
+            <div class="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-sm">
+              COMPOSITIONAL INFORMATION
+            </div>
+            <table class="w-full border-collapse">
+              <tbody>
+                <tr style="border-bottom: 1px solid black">
+                  <td class="py-1 px-2"></td>
+                  <td class="py-1 px-2 font-normal text-xs text-center">
+                    Per Serve
+                  </td>
+                </tr>
+                ${Object.entries(compositionalData).map(([key, data]: [string, any]) => `
+                  <tr style="border-bottom: ${getBorderThickness(data.borderThickness)}">
+                    <td class="py-1 px-2">
+                      ${key}
+                    </td>
+                    <td class="py-1 px-2 text-center">
+                      ${data.value}
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        ` : ''}
+        ${consumptionWarning ? `
+          <div class="w-full">
+            <div class="bg-red-600 text-white text-center py-2 px-4 font-bold tracking-widest text-sm">
+              CONSUMPTION WARNING
+            </div>
+            <div class="border border-red-600 p-4">
+              <p class="text-sm">${consumptionWarning}</p>
+            </div>
+          </div>
+        ` : ''}
+      </div>
+      
+      <div class="mb-4">
+        <h3 class="font-bold mb-2">Directions:</h3>
+        <p>${directions}</p>
+      </div>
+      
+      ${consumptionWarning ? `<div class="mb-4">
+        <h3 class="font-bold mb-2">Warning:</h3>
+        <p class="text-red-600">${consumptionWarning}</p>
+      </div>` : ''}
+      
+      <div class="mb-4">
+        <h3 class="font-bold mb-2">Ingredients:</h3>
+        <p>${ingredients}</p>
+      </div>
+      
+      <div class="mb-4">
+        <h3 class="font-bold mb-2">Allergen Advice:</h3>
+        <p>${allergenAdvice}</p>
+      </div>
+      
+      <div class="mb-4">
+        <h3 class="font-bold mb-2">Storage:</h3>
+        <p>${storage}</p>
+      </div>
+      
+      <div class="mb-4">
+        <p class="text-xs">${supplementaryInfo}</p>
+      </div>
+      
+      <div>
+        <p class="text-xs font-bold">${servingScoopInfo}</p>
+      </div>
+    </div>
+  `;
+}
+
+function generateAUProteinHTML(productData: any): string {
+  const {
+    product,
+    directions,
+    servingSize,
+    ingredients,
+    allergenAdvice,
+    storage,
+    supplementaryInfo,
+    servingScoopInfo,
+    nutritionalData,
+    nutritionalItems,
+    aminoAcidData,
+    template,
+  } = productData;
+
+  const getBorderThickness = (thickness: string = "light") => {
+    const thicknessMap: { [key: string]: string } = {
+      light: "1px solid black",
+      medium: "2px solid black",
+      large: "3px solid black",
+      xl: "4px solid black",
+      "2xl": "5px solid black",
+    };
+    return thicknessMap[thickness] || "1px solid black";
+  };
+
+  const thickBorderStyle = "5px solid black";
+
+  return `
+    <div class="max-w-2xl mx-auto bg-white text-black p-8 font-sans text-sm leading-tight">
+      <div class="grid gap-8 w-full grid-cols-1 lg:grid-cols-2">
+        <div class="space-y-4 w-full">
+          <div>
+            <h3 class="font-bold text-base mb-2">DIRECTIONS:</h3>
+            <p>${directions}</p>
+          </div>
+          <div>
+            <h3 class="font-bold text-base mb-2">SERVING SIZE:</h3>
+            <p>${servingSize}</p>
+          </div>
+          <div>
+            <h3 class="font-bold text-base mb-2">INGREDIENTS:</h3>
+            <p>${ingredients}</p>
+          </div>
+          <div>
+            <h3 class="font-bold text-base mb-2">ALLERGEN ADVICE:</h3>
+            <p>${allergenAdvice}</p>
+          </div>
+          <div>
+            <h3 class="font-bold text-base mb-2">STORAGE:</h3>
+            <p>${storage}</p>
+          </div>
+          <div>
+            <h3 class="font-bold text-base mb-2">FORMULATED SUPPLEMENTARY SPORTS FOOD.</h3>
+            <p>${supplementaryInfo}</p>
+          </div>
+          <div>
+            <h3 class="font-bold text-base mb-2">SERVING SCOOP INCLUDED,</h3>
+            <p>${servingScoopInfo}</p>
+          </div>
+        </div>
+        <div class="w-full">
+          <div class="w-full">
+            <div class="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-sm">
+              NUTRITIONAL INFORMATION
+            </div>
+            <table class="w-full border-collapse">
+              <tbody>
+                <tr style="border-bottom: ${thickBorderStyle}">
+                  <td class="py-1 px-2">
+                    Serving Size: ${nutritionalData.servingSize}
+                  </td>
+                  <td></td>
+                  <td class="py-1 px-2 text-right">
+                    Servings per Pack: ${nutritionalData.servingsPerPack}
+                  </td>
+                </tr>
+                <tr style="border-bottom: 1px solid black">
+                  <td class="py-1 px-2"></td>
+                  <td class="py-1 px-2 font-normal text-xs text-right w-32">
+                    Per Serve
+                  </td>
+                  <td class="py-1 px-2 text-center font-normal text-xs">
+                    Per 100g
+                  </td>
+                </tr>
+                ${nutritionalItems ? nutritionalItems.map((item: any) => `
+                  <tr style="border-bottom: ${getBorderThickness(item.borderThickness)}">
+                    <td class="py-1 px-2 ${item.label.includes("Saturated") || item.label.includes("Sugars") ? "italic pl-4" : ""}">
+                      ${item.label}
+                    </td>
+                    <td class="py-1 px-2 text-center">
+                      ${nutritionalData[item.serveKey] || "0"}
+                    </td>
+                    <td class="py-1 px-2 text-center">
+                      ${nutritionalData[item.per100gKey] || "0"}
+                    </td>
+                  </tr>
+                `).join('') : ''}
+              </tbody>
+            </table>
+          </div>
+          <div class="mt-6 w-full">
+            <div class="bg-black text-white text-center py-2 px-4 font-bold text-base">
+              TYPICAL AMINO ACID PROFILE
+            </div>
+            <div class="text-right py-1 font-semibold" style="border-bottom: ${thickBorderStyle}">
+              Per 100g of Protein
+            </div>
+            <table class="w-full border-collapse">
+              <tbody>
+                ${aminoAcidData ? Object.entries(aminoAcidData).map(([key, data]: [string, any]) => `
+                  <tr style="border-bottom: ${getBorderThickness(data.borderThickness)}">
+                    <td class="py-1 px-2">${key}</td>
+                    <td class="py-1 px-2 text-right">${data.value}</td>
+                  </tr>
+                `).join('') : ''}
+                <tr style="border-bottom: 1px solid black; border-top: ${thickBorderStyle}">
+                  <td class="py-1 px-2 font-semibold">
+                    BCAAs* = 5,832 mg per serve
+                  </td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mb-4">
+        <h3 class="font-bold mb-2">Directions:</h3>
+        <p>${directions}</p>
+      </div>
+      
+      <div class="mb-4">
+        <h3 class="font-bold mb-2">Ingredients:</h3>
+        <p>${ingredients}</p>
+      </div>
+      
+      <div class="mb-4">
+        <h3 class="font-bold mb-2">Allergen Advice:</h3>
+        <p>${allergenAdvice}</p>
+      </div>
+      
+      <div class="mb-4">
+        <h3 class="font-bold mb-2">Storage:</h3>
+        <p>${storage}</p>
+      </div>
+      
+      <div class="mb-4">
+        <p class="text-xs">${supplementaryInfo}</p>
+      </div>
+      
+      <div>
+        <p class="text-xs font-bold">${servingScoopInfo}</p>
+      </div>
+    </div>
+  `;
+}
+
+function generateAUSupplementsHTML(productData: any): string {
+  const {
+    product,
+    directions,
+    servingSize,
+    ingredients,
+    allergenAdvice,
+    storage,
+    supplementaryInfo,
+    servingScoopInfo,
+    nutritionalData,
+    nutritionalItems,
+    template,
+  } = productData;
+
+  const getBorderThickness = (thickness: string = "light") => {
+    const thicknessMap: { [key: string]: string } = {
+      light: "1px solid black",
+      medium: "2px solid black",
+      large: "3px solid black",
+      xl: "4px solid black",
+      "2xl": "5px solid black",
+    };
+    return thicknessMap[thickness] || "1px solid black";
+  };
+
+  const thickBorderStyle = "5px solid black";
+
+  return `
+    <div class="max-w-2xl mx-auto bg-white text-black p-8 font-sans text-sm leading-tight">
+      <div class="grid gap-8 w-full grid-cols-1">
+        <div class="w-full">
+          <div class="w-full">
+            <div class="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-sm">
+              NUTRITIONAL INFORMATION
+            </div>
+            <table class="w-full border-collapse">
+              <tbody>
+                <tr style="border-bottom: ${thickBorderStyle}">
+                  <td class="py-1 px-2">
+                    Serving Size: ${nutritionalData.servingSize}
+                  </td>
+                  <td></td>
+                  <td class="py-1 px-2 text-right">
+                    Servings per Bottle: ${nutritionalData.servingsPerPack}
+                  </td>
+                </tr>
+                <tr style="border-bottom: 1px solid black">
+                  <td class="py-1 px-2"></td>
+                  <td class="py-1 px-2 font-normal text-xs text-right w-32">
+                    Per Serve
+                  </td>
+                  <td class="py-1 px-2 text-center font-normal text-xs">
+                    Per 100g
+                  </td>
+                </tr>
+                ${nutritionalItems ? nutritionalItems.map((item: any) => `
+                  <tr style="border-bottom: ${getBorderThickness(item.borderThickness)}">
+                    <td class="py-1 px-2 ${item.label.includes("Saturated") || item.label.includes("Sugars") ? "italic pl-4" : ""}">
+                      ${item.label}
+                    </td>
+                    <td class="py-1 px-2 text-center">
+                      ${nutritionalData[item.serveKey] || "0"}
+                    </td>
+                    <td class="py-1 px-2 text-center">
+                      ${nutritionalData[item.per100gKey] || "0"}
+                    </td>
+                  </tr>
+                `).join('') : ''}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mb-4">
+        <h3 class="font-bold mb-2">Directions:</h3>
+        <p>${directions}</p>
+      </div>
+      
+      <div class="mb-4">
+        <h3 class="font-bold mb-2">Ingredients:</h3>
+        <p>${ingredients}</p>
+      </div>
+      
+      <div class="mb-4">
+        <h3 class="font-bold mb-2">Allergen Advice:</h3>
+        <p>${allergenAdvice}</p>
+      </div>
+      
+      <div class="mb-4">
+        <h3 class="font-bold mb-2">Storage:</h3>
+        <p>${storage}</p>
+      </div>
+      
+      <div class="mb-4">
+        <p class="text-xs">${supplementaryInfo}</p>
+      </div>
+      
+      <div>
+        <p class="text-xs font-bold">${servingScoopInfo}</p>
+      </div>
+    </div>
+  `;
+}
+
+function generateUSDefaultHTML(productData: any): string {
+  const {
+    product,
+    directions,
+    servingSize,
+    ingredients,
+    allergenAdvice,
+    storage,
+    supplementaryInfo,
+    servingScoopInfo,
+    nutritionalData,
+    nutritionalItems,
+    template,
+  } = productData;
+
+  const getBorderThickness = (thickness: string = "light") => {
+    const thicknessMap: { [key: string]: string } = {
+      light: "1px solid black",
+      medium: "2px solid black",
+      large: "3px solid black",
+      xl: "4px solid black",
+      "2xl": "5px solid black",
+    };
+    return thicknessMap[thickness] || "1px solid black";
+  };
+
+  const thickBorderStyle = "5px solid black";
+
+  return `
+    <div class="max-w-2xl mx-auto bg-white text-black p-8 font-sans text-sm leading-tight">
+      <div class="grid gap-8 w-full grid-cols-1">
+        <div class="w-full">
+          <div class="w-full">
+            <div class="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-sm">
+              NUTRITION FACTS
+            </div>
+            <table class="w-full border-collapse">
+              <tbody>
+                <tr style="border-bottom: ${thickBorderStyle}">
+                  <td class="py-1 px-2">
+                    Serving Size: ${nutritionalData.servingSize}
+                  </td>
+                  <td></td>
+                  <td class="py-1 px-2 text-right">
+                    Servings per Container: ${nutritionalData.servingsPerPack}
+                  </td>
+                </tr>
+                <tr style="border-bottom: 1px solid black">
+                  <td class="py-1 px-2"></td>
+                  <td class="py-1 px-2 font-normal text-xs text-right w-32">
+                    Amount Per Serving
+                  </td>
+                  <td class="py-1 px-2 text-center font-normal text-xs">
+                    % Daily Value*
+                  </td>
+                </tr>
+                ${nutritionalItems ? nutritionalItems.map((item: any) => `
+                  <tr style="border-bottom: ${getBorderThickness(item.borderThickness)}">
+                    <td class="py-1 px-2 ${item.label.includes("Saturated") || item.label.includes("Sugars") || item.label.includes("Added") || item.label.includes("Dietary") ? "italic pl-4" : ""}">
+                      ${item.label}
+                    </td>
+                    <td class="py-1 px-2 text-center">
+                      ${nutritionalData[item.serveKey] || "0"}
+                    </td>
+                    <td class="py-1 px-2 text-center">
+                      ${nutritionalData[item.dailyValueKey] || "*"}
+                    </td>
+                  </tr>
+                `).join('') : ''}
+              </tbody>
+            </table>
+            <div class="text-xs mt-2 px-2">
+              * Daily Value not established.
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mb-4">
+        <h3 class="font-bold mb-2">Directions:</h3>
+        <p>${directions}</p>
+      </div>
+      
+      <div class="mb-4">
+        <h3 class="font-bold mb-2">Ingredients:</h3>
+        <p>${ingredients}</p>
+      </div>
+      
+      <div class="mb-4">
+        <h3 class="font-bold mb-2">Allergen Advice:</h3>
+        <p>${allergenAdvice}</p>
+      </div>
+      
+      <div class="mb-4">
+        <h3 class="font-bold mb-2">Storage:</h3>
+        <p>${storage}</p>
+      </div>
+      
+      <div class="mb-4">
+        <p class="text-xs">${supplementaryInfo}</p>
+      </div>
+      
+      <div>
+        <p class="text-xs font-bold">${servingScoopInfo}</p>
+      </div>
+    </div>
+  `;
+}
+
+function generateAUDefaultHTML(productData: any): string {
+  const {
+    product,
+    directions,
+    servingSize,
+    ingredients,
+    allergenAdvice,
+    storage,
+    supplementaryInfo,
+    servingScoopInfo,
+    nutritionalData,
+    nutritionalItems,
+    template,
+  } = productData;
+
+  const getBorderThickness = (thickness: string = "light") => {
+    const thicknessMap: { [key: string]: string } = {
+      light: "1px solid black",
+      medium: "2px solid black",
+      large: "3px solid black",
+      xl: "4px solid black",
+      "2xl": "5px solid black",
+    };
+    return thicknessMap[thickness] || "1px solid black";
+  };
+
+  const thickBorderStyle = "5px solid black";
+
+  return `
+    <div class="max-w-2xl mx-auto bg-white text-black p-8 font-sans text-sm leading-tight">
+      <div class="grid gap-8 w-full grid-cols-1">
+        <div class="w-full">
+          <div class="w-full">
+            <div class="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-sm">
+              NUTRITIONAL INFORMATION
+            </div>
+            <table class="w-full border-collapse">
+              <tbody>
+                <tr style="border-bottom: ${thickBorderStyle}">
+                  <td class="py-1 px-2">
+                    Serving Size: ${nutritionalData.servingSize}
+                  </td>
+                  <td></td>
+                  <td class="py-1 px-2 text-right">
+                    Servings per Bottle: ${nutritionalData.servingsPerPack}
+                  </td>
+                </tr>
+                <tr style="border-bottom: 1px solid black">
+                  <td class="py-1 px-2"></td>
+                  <td class="py-1 px-2 font-normal text-xs text-right w-32">
+                    Per Serve
+                  </td>
+                  <td class="py-1 px-2 text-center font-normal text-xs">
+                    Per 100g
+                  </td>
+                </tr>
+                ${nutritionalItems ? nutritionalItems.map((item: any) => `
+                  <tr style="border-bottom: ${getBorderThickness(item.borderThickness)}">
+                    <td class="py-1 px-2 ${item.label.includes("Saturated") || item.label.includes("Sugars") ? "italic pl-4" : ""}">
+                      ${item.label}
+                    </td>
+                    <td class="py-1 px-2 text-center">
+                      ${nutritionalData[item.serveKey] || "0"}
+                    </td>
+                    <td class="py-1 px-2 text-center">
+                      ${nutritionalData[item.per100gKey] || "0"}
+                    </td>
+                  </tr>
+                `).join('') : ''}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
       
