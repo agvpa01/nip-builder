@@ -248,9 +248,20 @@ function generateAUComplexHTML(productData: any): string {
                     Per 100g
                   </td>
                 </tr>
-                ${nutritionalItems ? nutritionalItems.map((item: any) => `
-                  <tr style="border-bottom: ${getBorderThickness(item.borderThickness)}">
-                    <td class="py-1 px-2 ${item.label.includes("Saturated") || item.label.includes("Sugars") ? "italic pl-4" : ""}">
+                ${
+                  nutritionalItems
+                    ? nutritionalItems
+                        .map(
+                          (item: any) => `
+                  <tr style="border-bottom: ${getBorderThickness(
+                    item.borderThickness
+                  )}">
+                    <td class="py-1 px-2 ${
+                      item.label.includes("Saturated") ||
+                      item.label.includes("Sugars")
+                        ? "italic pl-4"
+                        : ""
+                    }">
                       ${item.label}
                     </td>
                     <td class="py-1 px-2 text-center">
@@ -260,21 +271,35 @@ function generateAUComplexHTML(productData: any): string {
                       ${nutritionalData[item.per100gKey] || "0"}
                     </td>
                   </tr>
-                `).join('') : ''}
-                ${compositionalData ? `
+                `
+                        )
+                        .join("")
+                    : ""
+                }
+                ${
+                  compositionalData
+                    ? `
                   <tr>
                     <td colspan="3" class="bg-black text-white text-center py-2 px-4 font-bold text-base">
                       COMPOSITIONAL INFORMATION
                     </td>
                   </tr>
-                  ${Object.entries(compositionalData).map(([key, data]: [string, any]) => `
-                    <tr style="border-bottom: ${getBorderThickness(data.borderThickness)}">
+                  ${Object.entries(compositionalData)
+                    .map(
+                      ([key, data]: [string, any]) => `
+                    <tr style="border-bottom: ${getBorderThickness(
+                      data.borderThickness
+                    )}">
                       <td class="py-1 px-2">${key}</td>
                       <td class="py-1 px-2 text-center">${data.serve}</td>
                       <td class="py-1 px-2 text-center">${data.per100g}</td>
                     </tr>
-                  `).join('')}
-                ` : ''}
+                  `
+                    )
+                    .join("")}
+                `
+                    : ""
+                }
               </tbody>
             </table>
           </div>
@@ -283,9 +308,13 @@ function generateAUComplexHTML(productData: any): string {
               <h3 class="font-bold text-base mb-2">INGREDIENTS:</h3>
               <div class="text-sm">${ingredients}</div>
             </div>
-            ${consumptionWarning ? `<div class="border-2 border-black text-center py-2 px-4 font-bold text-xs">
+            ${
+              consumptionWarning
+                ? `<div class="border-2 border-black text-center py-2 px-4 font-bold text-xs">
               ${consumptionWarning}
-            </div>` : ''}
+            </div>`
+                : ""
+            }
           </div>
         </div>
       </div>
@@ -378,9 +407,22 @@ function generateUSProteinHTML(productData: any): string {
                     % Daily Value*
                   </td>
                 </tr>
-                ${nutritionalItems ? nutritionalItems.map((item: any) => `
-                  <tr style="border-bottom: ${getBorderThickness(item.borderThickness)}">
-                    <td class="py-1 px-2 ${item.label.includes("Saturated") || item.label.includes("Sugars") || item.label.includes("Added") || item.label.includes("Dietary") ? "italic pl-4" : ""}">
+                ${
+                  nutritionalItems
+                    ? nutritionalItems
+                        .map(
+                          (item: any) => `
+                  <tr style="border-bottom: ${getBorderThickness(
+                    item.borderThickness
+                  )}">
+                    <td class="py-1 px-2 ${
+                      item.label.includes("Saturated") ||
+                      item.label.includes("Sugars") ||
+                      item.label.includes("Added") ||
+                      item.label.includes("Dietary")
+                        ? "italic pl-4"
+                        : ""
+                    }">
                       ${item.label}
                     </td>
                     <td class="py-1 px-2 text-center">
@@ -390,7 +432,11 @@ function generateUSProteinHTML(productData: any): string {
                       ${nutritionalData[item.dailyValueKey] || "*"}
                     </td>
                   </tr>
-                `).join('') : ''}
+                `
+                        )
+                        .join("")
+                    : ""
+                }
               </tbody>
             </table>
             <div class="text-xs mt-2 px-2">
@@ -398,7 +444,11 @@ function generateUSProteinHTML(productData: any): string {
             </div>
           </div>
         </div>
-        ${template === "protein" && aminoAcidData && Object.keys(aminoAcidData).length > 0 ? `
+        ${
+          template === "protein" &&
+          aminoAcidData &&
+          Object.keys(aminoAcidData).length > 0
+            ? `
           <div class="w-full">
             <div class="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-sm">
               TYPICAL AMINO ACID PROFILE
@@ -411,8 +461,12 @@ function generateUSProteinHTML(productData: any): string {
                     Per Serve
                   </td>
                 </tr>
-                ${Object.entries(aminoAcidData).map(([key, data]: [string, any]) => `
-                  <tr style="border-bottom: ${getBorderThickness(data.borderThickness)}">
+                ${Object.entries(aminoAcidData)
+                  .map(
+                    ([key, data]: [string, any]) => `
+                  <tr style="border-bottom: ${getBorderThickness(
+                    data.borderThickness
+                  )}">
                     <td class="py-1 px-2">
                       ${key}
                     </td>
@@ -420,11 +474,15 @@ function generateUSProteinHTML(productData: any): string {
                       ${data.value}
                     </td>
                   </tr>
-                `).join('')}
+                `
+                  )
+                  .join("")}
               </tbody>
             </table>
           </div>
-        ` : ''}
+        `
+            : ""
+        }
       </div>
       
       <div class="mb-4">
@@ -516,9 +574,22 @@ function generateUSComplexHTML(productData: any): string {
                     % Daily Value*
                   </td>
                 </tr>
-                ${nutritionalItems ? nutritionalItems.map((item: any) => `
-                  <tr style="border-bottom: ${getBorderThickness(item.borderThickness)}">
-                    <td class="py-1 px-2 ${item.label.includes("Saturated") || item.label.includes("Sugars") || item.label.includes("Added") || item.label.includes("Dietary") ? "italic pl-4" : ""}">
+                ${
+                  nutritionalItems
+                    ? nutritionalItems
+                        .map(
+                          (item: any) => `
+                  <tr style="border-bottom: ${getBorderThickness(
+                    item.borderThickness
+                  )}">
+                    <td class="py-1 px-2 ${
+                      item.label.includes("Saturated") ||
+                      item.label.includes("Sugars") ||
+                      item.label.includes("Added") ||
+                      item.label.includes("Dietary")
+                        ? "italic pl-4"
+                        : ""
+                    }">
                       ${item.label}
                     </td>
                     <td class="py-1 px-2 text-center">
@@ -528,7 +599,11 @@ function generateUSComplexHTML(productData: any): string {
                       ${nutritionalData[item.dailyValueKey] || "*"}
                     </td>
                   </tr>
-                `).join('') : ''}
+                `
+                        )
+                        .join("")
+                    : ""
+                }
               </tbody>
             </table>
             <div class="text-xs mt-2 px-2">
@@ -536,7 +611,11 @@ function generateUSComplexHTML(productData: any): string {
             </div>
           </div>
         </div>
-        ${template === "complex" && compositionalData && Object.keys(compositionalData).length > 0 ? `
+        ${
+          template === "complex" &&
+          compositionalData &&
+          Object.keys(compositionalData).length > 0
+            ? `
           <div class="w-full">
             <div class="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-sm">
               COMPOSITIONAL INFORMATION
@@ -549,8 +628,12 @@ function generateUSComplexHTML(productData: any): string {
                     Per Serve
                   </td>
                 </tr>
-                ${Object.entries(compositionalData).map(([key, data]: [string, any]) => `
-                  <tr style="border-bottom: ${getBorderThickness(data.borderThickness)}">
+                ${Object.entries(compositionalData)
+                  .map(
+                    ([key, data]: [string, any]) => `
+                  <tr style="border-bottom: ${getBorderThickness(
+                    data.borderThickness
+                  )}">
                     <td class="py-1 px-2">
                       ${key}
                     </td>
@@ -558,12 +641,18 @@ function generateUSComplexHTML(productData: any): string {
                       ${data.value}
                     </td>
                   </tr>
-                `).join('')}
+                `
+                  )
+                  .join("")}
               </tbody>
             </table>
           </div>
-        ` : ''}
-        ${consumptionWarning ? `
+        `
+            : ""
+        }
+        ${
+          consumptionWarning
+            ? `
           <div class="w-full">
             <div class="bg-red-600 text-white text-center py-2 px-4 font-bold tracking-widest text-sm">
               CONSUMPTION WARNING
@@ -572,7 +661,9 @@ function generateUSComplexHTML(productData: any): string {
               <div class="text-sm">${consumptionWarning}</div>
             </div>
           </div>
-        ` : ''}
+        `
+            : ""
+        }
       </div>
       
       <div class="mb-4">
@@ -580,10 +671,14 @@ function generateUSComplexHTML(productData: any): string {
         <div>${directions}</div>
       </div>
       
-      ${consumptionWarning ? `<div class="mb-4">
+      ${
+        consumptionWarning
+          ? `<div class="mb-4">
         <h3 class="font-bold mb-2">Warning:</h3>
         <div class="text-red-600">${consumptionWarning}</div>
-      </div>` : ''}
+      </div>`
+          : ""
+      }
       
       <div class="mb-4">
         <h3 class="font-bold mb-2">Ingredients:</h3>
@@ -698,9 +793,20 @@ function generateAUProteinHTML(productData: any): string {
                     Per 100g
                   </td>
                 </tr>
-                ${nutritionalItems ? nutritionalItems.map((item: any) => `
-                  <tr style="border-bottom: ${getBorderThickness(item.borderThickness)}">
-                    <td class="py-1 px-2 ${item.label.includes("Saturated") || item.label.includes("Sugars") ? "italic pl-4" : ""}">
+                ${
+                  nutritionalItems
+                    ? nutritionalItems
+                        .map(
+                          (item: any) => `
+                  <tr style="border-bottom: ${getBorderThickness(
+                    item.borderThickness
+                  )}">
+                    <td class="py-1 px-2 ${
+                      item.label.includes("Saturated") ||
+                      item.label.includes("Sugars")
+                        ? "italic pl-4"
+                        : ""
+                    }">
                       ${item.label}
                     </td>
                     <td class="py-1 px-2 text-center">
@@ -710,7 +816,11 @@ function generateAUProteinHTML(productData: any): string {
                       ${nutritionalData[item.per100gKey] || "0"}
                     </td>
                   </tr>
-                `).join('') : ''}
+                `
+                        )
+                        .join("")
+                    : ""
+                }
               </tbody>
             </table>
           </div>
@@ -723,12 +833,22 @@ function generateAUProteinHTML(productData: any): string {
             </div>
             <table class="w-full border-collapse">
               <tbody>
-                ${aminoAcidData ? Object.entries(aminoAcidData).map(([key, data]: [string, any]) => `
-                  <tr style="border-bottom: ${getBorderThickness(data.borderThickness)}">
+                ${
+                  aminoAcidData
+                    ? Object.entries(aminoAcidData)
+                        .map(
+                          ([key, data]: [string, any]) => `
+                  <tr style="border-bottom: ${getBorderThickness(
+                    data.borderThickness
+                  )}">
                     <td class="py-1 px-2">${key}</td>
                     <td class="py-1 px-2 text-right">${data.value}</td>
                   </tr>
-                `).join('') : ''}
+                `
+                        )
+                        .join("")
+                    : ""
+                }
                 <tr style="border-bottom: 1px solid black; border-top: ${thickBorderStyle}">
                   <td class="py-1 px-2 font-semibold">
                     BCAAs* = 5,832 mg per serve
@@ -828,9 +948,20 @@ function generateAUSupplementsHTML(productData: any): string {
                     Per 100g
                   </td>
                 </tr>
-                ${nutritionalItems ? nutritionalItems.map((item: any) => `
-                  <tr style="border-bottom: ${getBorderThickness(item.borderThickness)}">
-                    <td class="py-1 px-2 ${item.label.includes("Saturated") || item.label.includes("Sugars") ? "italic pl-4" : ""}">
+                ${
+                  nutritionalItems
+                    ? nutritionalItems
+                        .map(
+                          (item: any) => `
+                  <tr style="border-bottom: ${getBorderThickness(
+                    item.borderThickness
+                  )}">
+                    <td class="py-1 px-2 ${
+                      item.label.includes("Saturated") ||
+                      item.label.includes("Sugars")
+                        ? "italic pl-4"
+                        : ""
+                    }">
                       ${item.label}
                     </td>
                     <td class="py-1 px-2 text-center">
@@ -840,7 +971,11 @@ function generateAUSupplementsHTML(productData: any): string {
                       ${nutritionalData[item.per100gKey] || "0"}
                     </td>
                   </tr>
-                `).join('') : ''}
+                `
+                        )
+                        .join("")
+                    : ""
+                }
               </tbody>
             </table>
           </div>
@@ -934,9 +1069,22 @@ function generateUSDefaultHTML(productData: any): string {
                     % Daily Value*
                   </td>
                 </tr>
-                ${nutritionalItems ? nutritionalItems.map((item: any) => `
-                  <tr style="border-bottom: ${getBorderThickness(item.borderThickness)}">
-                    <td class="py-1 px-2 ${item.label.includes("Saturated") || item.label.includes("Sugars") || item.label.includes("Added") || item.label.includes("Dietary") ? "italic pl-4" : ""}">
+                ${
+                  nutritionalItems
+                    ? nutritionalItems
+                        .map(
+                          (item: any) => `
+                  <tr style="border-bottom: ${getBorderThickness(
+                    item.borderThickness
+                  )}">
+                    <td class="py-1 px-2 ${
+                      item.label.includes("Saturated") ||
+                      item.label.includes("Sugars") ||
+                      item.label.includes("Added") ||
+                      item.label.includes("Dietary")
+                        ? "italic pl-4"
+                        : ""
+                    }">
                       ${item.label}
                     </td>
                     <td class="py-1 px-2 text-center">
@@ -946,7 +1094,11 @@ function generateUSDefaultHTML(productData: any): string {
                       ${nutritionalData[item.dailyValueKey] || "*"}
                     </td>
                   </tr>
-                `).join('') : ''}
+                `
+                        )
+                        .join("")
+                    : ""
+                }
               </tbody>
             </table>
             <div class="text-xs mt-2 px-2">
@@ -1043,9 +1195,20 @@ function generateAUDefaultHTML(productData: any): string {
                     Per 100g
                   </td>
                 </tr>
-                ${nutritionalItems ? nutritionalItems.map((item: any) => `
-                  <tr style="border-bottom: ${getBorderThickness(item.borderThickness)}">
-                    <td class="py-1 px-2 ${item.label.includes("Saturated") || item.label.includes("Sugars") ? "italic pl-4" : ""}">
+                ${
+                  nutritionalItems
+                    ? nutritionalItems
+                        .map(
+                          (item: any) => `
+                  <tr style="border-bottom: ${getBorderThickness(
+                    item.borderThickness
+                  )}">
+                    <td class="py-1 px-2 ${
+                      item.label.includes("Saturated") ||
+                      item.label.includes("Sugars")
+                        ? "italic pl-4"
+                        : ""
+                    }">
                       ${item.label}
                     </td>
                     <td class="py-1 px-2 text-center">
@@ -1055,7 +1218,11 @@ function generateAUDefaultHTML(productData: any): string {
                       ${nutritionalData[item.per100gKey] || "0"}
                     </td>
                   </tr>
-                `).join('') : ''}
+                `
+                        )
+                        .join("")
+                    : ""
+                }
               </tbody>
             </table>
           </div>

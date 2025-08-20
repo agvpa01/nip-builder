@@ -80,19 +80,25 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
   const [directions, setDirections] = useState(
     template === "complex"
       ? "Mix 1 scoop (6.2g) with 200-300mL of water. Consume 30 minutes before training."
+      : template === "supplements"
+      ? "Take 1-2 capsules daily with water, preferably with meals, or as directed by your healthcare professional."
       : "Add 1 heaped scoop (30g) to 200mL of water or low fat milk. Stir or shake for 20 seconds, or until completely dispersed."
   );
   const [servingSize, setServingSize] = useState(
-    template === "complex" ? "6.2 grams" : "30 grams"
+    template === "complex" ? "6.2 grams" : template === "supplements" ? "2 capsules" : "30 grams"
   );
   const [ingredients, setIngredients] = useState(
     template === "complex"
       ? "Creatine Monohydrate, Beta Alanine, Arginine Alpha-ketoglutarate, Natural Flavour, Citrulline Malate, Caffeine, L-Tyrosine, Sweetener (Sucralose), Calcium Ascorbate, Citric Acid, Silica Dioxide, Pyridoxine HCl, Pteroylglutamic Acid, Cyanocobalamin, Colour."
+      : template === "supplements"
+      ? "Magnesium Oxide, Microcrystalline Cellulose, Vegetable Capsule (Hypromellose), Anti-caking Agent (Magnesium Stearate)."
       : "Whey Protein Isolate (Milk)(Emulsifier (Soy Lecithin)), Flavour, Xanthan, Sucralose."
   );
   const [allergenAdvice, setAllergenAdvice] = useState(
     template === "complex"
       ? "Contains Caffeine."
+      : template === "supplements"
+      ? "Free from major allergens. Manufactured in a facility that may process milk, soy, and nuts."
       : "Contains Milk and less than 1% Soy Lecithin (as instantiser)."
   );
   const [storage, setStorage] = useState(
@@ -128,6 +134,7 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
       label: "Protein (g)",
       serveKey: "protein_serve",
       per100gKey: "protein_100g",
+      dailyValueKey: "protein_dv",
       borderThickness: "light",
     },
     {
@@ -135,6 +142,7 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
       label: "Total Fat (g)",
       serveKey: "fat_serve",
       per100gKey: "fat_100g",
+      dailyValueKey: "fat_dv",
       borderThickness: "light",
     },
     {
@@ -142,6 +150,7 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
       label: "Saturated Fat (g)",
       serveKey: "saturated_fat_serve",
       per100gKey: "saturated_fat_100g",
+      dailyValueKey: "saturated_fat_dv",
       borderThickness: "light",
     },
     {
@@ -149,6 +158,7 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
       label: "Total Carbohydrate (g)",
       serveKey: "carbs_serve",
       per100gKey: "carbs_100g",
+      dailyValueKey: "carbs_dv",
       borderThickness: "light",
     },
     {
@@ -163,6 +173,7 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
       label: "Sodium (mg)",
       serveKey: "sodium_serve",
       per100gKey: "sodium_100g",
+      dailyValueKey: "sodium_dv",
       borderThickness: "light",
     },
     {
@@ -279,6 +290,7 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
       label: "Protein (g)",
       serveKey: "protein_serve",
       per100gKey: "protein_100g",
+      dailyValueKey: "protein_dv",
       borderThickness: "light",
     },
     {
@@ -286,6 +298,7 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
       label: "Total Fat (g)",
       serveKey: "fat_serve",
       per100gKey: "fat_100g",
+      dailyValueKey: "fat_dv",
       borderThickness: "light",
     },
     {
@@ -293,6 +306,7 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
       label: "Saturated Fat (g)",
       serveKey: "saturated_fat_serve",
       per100gKey: "saturated_fat_100g",
+      dailyValueKey: "saturated_fat_dv",
       borderThickness: "light",
     },
     {
@@ -300,6 +314,7 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
       label: "Total Carbohydrate (g)",
       serveKey: "carbs_serve",
       per100gKey: "carbs_100g",
+      dailyValueKey: "carbs_dv",
       borderThickness: "light",
     },
     {
@@ -314,6 +329,7 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
       label: "Sodium (mg)",
       serveKey: "sodium_serve",
       per100gKey: "sodium_100g",
+      dailyValueKey: "sodium_dv",
       borderThickness: "light",
     },
     {
@@ -702,8 +718,6 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
     }
   };
 
-
-
   if (showPreview) {
     return (
       <div className="w-full">
@@ -712,14 +726,14 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
             <Eye className="w-4 h-4 mr-2" />
             Back to Editor
           </Button>
-          <Button 
-             onClick={handleSaveHTML} 
-             variant="secondary"
-             disabled={isSavingHTML}
-           >
-             <Save className="w-4 h-4 mr-2" />
-             {isSavingHTML ? "Saving..." : "Save HTML"}
-           </Button>
+          <Button
+            onClick={handleSaveHTML}
+            variant="secondary"
+            disabled={isSavingHTML}
+          >
+            <Save className="w-4 h-4 mr-2" />
+            {isSavingHTML ? "Saving..." : "Save HTML"}
+          </Button>
           <Button onClick={handleSaveHTML}>
             <Download className="w-4 h-4 mr-2" />
             Save HTML
@@ -754,14 +768,14 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
           <Eye className="w-4 h-4 mr-2" />
           Preview NIP
         </Button>
-        <Button 
-           onClick={handleSaveHTML} 
-           variant="secondary"
-           disabled={isSavingHTML}
-         >
-           <Save className="w-4 h-4 mr-2" />
-           {isSavingHTML ? "Saving..." : "Save HTML"}
-         </Button>
+        <Button
+          onClick={handleSaveHTML}
+          variant="secondary"
+          disabled={isSavingHTML}
+        >
+          <Save className="w-4 h-4 mr-2" />
+          {isSavingHTML ? "Saving..." : "Save HTML"}
+        </Button>
 
         <div className="flex gap-2">
           <Button
@@ -927,24 +941,26 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
               {nutritionalItems.map((item) => (
                 <div
                   key={item.id}
-                  className="grid grid-cols-6 gap-2 items-center"
+                  className="grid grid-cols-5 gap-2 items-center"
                 >
-                  <Input
+                  <RichTextarea
                     placeholder="Nutrient name"
                     value={item.label}
-                    onChange={(e) =>
-                      updateNutritionalItemLabel(item.id, e.target.value)
+                    onChange={(value) =>
+                      updateNutritionalItemLabel(item.id, value)
                     }
                     className="text-sm"
+                    rows={1}
                   />
-                  <Input
+                  <RichTextarea
                     placeholder="Per Serve"
                     value={nutritionalData[item.serveKey] || ""}
-                    onChange={(e) =>
-                      updateNutritionalData(item.serveKey, e.target.value)
+                    onChange={(value) =>
+                      updateNutritionalData(item.serveKey, value)
                     }
+                    rows={1}
                   />
-                  <Input
+                  <RichTextarea
                     placeholder={region === "AU" ? "Per 100g" : "Daily Value"}
                     value={
                       nutritionalData[
@@ -953,14 +969,15 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
                           : item.dailyValueKey || item.per100gKey
                       ] || ""
                     }
-                    onChange={(e) =>
+                    onChange={(value) =>
                       updateNutritionalData(
                         region === "AU"
                           ? item.per100gKey
                           : item.dailyValueKey || item.per100gKey,
-                        e.target.value
+                        value
                       )
                     }
+                    rows={1}
                   />
                   <select
                     value={item.borderThickness || "light"}

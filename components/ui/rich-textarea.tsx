@@ -42,10 +42,10 @@ export function RichTextarea({
       if (selection && selection.rangeCount > 0) {
         savedRange = selection.getRangeAt(0).cloneRange();
       }
-      
+
       // Update content
       editorRef.current.innerHTML = value;
-      
+
       // Restore selection if it was saved and editor is focused
       if (savedRange && document.activeElement === editorRef.current) {
         try {
@@ -89,159 +89,171 @@ export function RichTextarea({
     }
   }, []);
 
-  const executeCommand = useCallback((command: string) => {
-    if (!editorRef.current) return;
+  const executeCommand = useCallback(
+    (command: string) => {
+      if (!editorRef.current) return;
 
-    // Focus the editor first
-    editorRef.current.focus();
-    
-    // Restore selection if we have one saved
-    if (savedSelectionRef.current) {
-      restoreSelection();
-    }
+      // Focus the editor first
+      editorRef.current.focus();
 
-    const selection = window.getSelection();
-    if (!selection) return;
-
-    let range: Range;
-    if (selection.rangeCount === 0) {
-      // Create a range at the end of the content
-      range = document.createRange();
-      const lastChild = editorRef.current.lastChild;
-      if (lastChild) {
-        if (lastChild.nodeType === Node.TEXT_NODE) {
-          range.setStart(lastChild, lastChild.textContent?.length || 0);
-        } else {
-          range.setStartAfter(lastChild);
-        }
-      } else {
-        range.setStart(editorRef.current, 0);
+      // Restore selection if we have one saved
+      if (savedSelectionRef.current) {
+        restoreSelection();
       }
-      range.collapse(true);
-      selection.removeAllRanges();
-      selection.addRange(range);
-    } else {
-      range = selection.getRangeAt(0);
-    }
 
-    if (!editorRef.current.contains(range.commonAncestorContainer)) return;
+      const selection = window.getSelection();
+      if (!selection) return;
 
-    let tagName: string;
-    switch (command) {
-      case 'bold':
-        tagName = 'strong';
-        break;
-      case 'italic':
-        tagName = 'em';
-        break;
-      case 'underline':
-        tagName = 'u';
-        break;
-      default:
-        return;
-    }
-
-    try {
-      if (range.collapsed) {
-        // No selection - insert formatting element and position cursor inside
-        const element = document.createElement(tagName);
-        element.textContent = '\u200B'; // Zero-width space as placeholder
-        range.insertNode(element);
-        
-        // Position cursor inside the new element
-        const newRange = document.createRange();
-        newRange.setStart(element.firstChild!, 1);
-        newRange.collapse(true);
-        selection.removeAllRanges();
-        selection.addRange(newRange);
-      } else {
-        // Text is selected - check if already formatted
-        const selectedText = range.toString();
-        const startContainer = range.startContainer;
-        const endContainer = range.endContainer;
-        
-        // Check if selection is within a formatting tag
-        let formatElement: Element | null = null;
-        let node = startContainer.nodeType === Node.TEXT_NODE ? startContainer.parentElement : startContainer as Element;
-        
-        while (node && editorRef.current.contains(node)) {
-          if (node.tagName?.toLowerCase() === tagName) {
-            formatElement = node;
-            break;
+      let range: Range;
+      if (selection.rangeCount === 0) {
+        // Create a range at the end of the content
+        range = document.createRange();
+        const lastChild = editorRef.current.lastChild;
+        if (lastChild) {
+          if (lastChild.nodeType === Node.TEXT_NODE) {
+            range.setStart(lastChild, lastChild.textContent?.length || 0);
+          } else {
+            range.setStartAfter(lastChild);
           }
-          node = node.parentElement;
+        } else {
+          range.setStart(editorRef.current, 0);
         }
-        
-        if (formatElement) {
-          // Remove formatting - unwrap the element
-          const parent = formatElement.parentNode!;
-          while (formatElement.firstChild) {
-            parent.insertBefore(formatElement.firstChild, formatElement);
-          }
-          parent.removeChild(formatElement);
-          
-          // Restore selection on the unwrapped text
+        range.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(range);
+      } else {
+        range = selection.getRangeAt(0);
+      }
+
+      if (!editorRef.current.contains(range.commonAncestorContainer)) return;
+
+      let tagName: string;
+      switch (command) {
+        case "bold":
+          tagName = "strong";
+          break;
+        case "italic":
+          tagName = "em";
+          break;
+        case "underline":
+          tagName = "u";
+          break;
+        default:
+          return;
+      }
+
+      try {
+        if (range.collapsed) {
+          // No selection - insert formatting element and position cursor inside
+          const element = document.createElement(tagName);
+          element.textContent = "\u200B"; // Zero-width space as placeholder
+          range.insertNode(element);
+
+          // Position cursor inside the new element
           const newRange = document.createRange();
-          const walker = document.createTreeWalker(
-            editorRef.current,
-            NodeFilter.SHOW_TEXT,
-            null
-          );
-          
-          let currentNode;
-          let textLength = 0;
-          let startFound = false;
-          
-          while (currentNode = walker.nextNode()) {
-            const nodeText = currentNode.textContent || '';
-            if (!startFound && textLength + nodeText.length >= range.startOffset) {
-              newRange.setStart(currentNode, range.startOffset - textLength);
-              startFound = true;
-            }
-            if (startFound && textLength + nodeText.length >= range.endOffset) {
-              newRange.setEnd(currentNode, range.endOffset - textLength);
-              break;
-            }
-            textLength += nodeText.length;
-          }
-          
+          newRange.setStart(element.firstChild!, 1);
+          newRange.collapse(true);
           selection.removeAllRanges();
           selection.addRange(newRange);
         } else {
-          // Apply formatting - wrap selection
-          const element = document.createElement(tagName);
-          try {
-            element.appendChild(range.extractContents());
-            range.insertNode(element);
-            
-            // Select the formatted text
+          // Text is selected - check if already formatted
+          const selectedText = range.toString();
+          const startContainer = range.startContainer;
+          const endContainer = range.endContainer;
+
+          // Check if selection is within a formatting tag
+          let formatElement: Element | null = null;
+          let node =
+            startContainer.nodeType === Node.TEXT_NODE
+              ? startContainer.parentElement
+              : (startContainer as Element);
+
+          while (node && editorRef.current.contains(node)) {
+            if (node.tagName?.toLowerCase() === tagName) {
+              formatElement = node;
+              break;
+            }
+            node = node.parentElement;
+          }
+
+          if (formatElement) {
+            // Remove formatting - unwrap the element
+            const parent = formatElement.parentNode!;
+            while (formatElement.firstChild) {
+              parent.insertBefore(formatElement.firstChild, formatElement);
+            }
+            parent.removeChild(formatElement);
+
+            // Restore selection on the unwrapped text
             const newRange = document.createRange();
-            newRange.selectNodeContents(element);
+            const walker = document.createTreeWalker(
+              editorRef.current,
+              NodeFilter.SHOW_TEXT,
+              null
+            );
+
+            let currentNode;
+            let textLength = 0;
+            let startFound = false;
+
+            while ((currentNode = walker.nextNode())) {
+              const nodeText = currentNode.textContent || "";
+              if (
+                !startFound &&
+                textLength + nodeText.length >= range.startOffset
+              ) {
+                newRange.setStart(currentNode, range.startOffset - textLength);
+                startFound = true;
+              }
+              if (
+                startFound &&
+                textLength + nodeText.length >= range.endOffset
+              ) {
+                newRange.setEnd(currentNode, range.endOffset - textLength);
+                break;
+              }
+              textLength += nodeText.length;
+            }
+
             selection.removeAllRanges();
             selection.addRange(newRange);
-          } catch (e) {
-            // Fallback: just insert the element with the selected text
-            element.textContent = selectedText;
-            range.deleteContents();
-            range.insertNode(element);
-            
-            const newRange = document.createRange();
-            newRange.selectNodeContents(element);
-            selection.removeAllRanges();
-            selection.addRange(newRange);
+          } else {
+            // Apply formatting - wrap selection
+            const element = document.createElement(tagName);
+            try {
+              element.appendChild(range.extractContents());
+              range.insertNode(element);
+
+              // Select the formatted text
+              const newRange = document.createRange();
+              newRange.selectNodeContents(element);
+              selection.removeAllRanges();
+              selection.addRange(newRange);
+            } catch (e) {
+              // Fallback: just insert the element with the selected text
+              element.textContent = selectedText;
+              range.deleteContents();
+              range.insertNode(element);
+
+              const newRange = document.createRange();
+              newRange.selectNodeContents(element);
+              selection.removeAllRanges();
+              selection.addRange(newRange);
+            }
           }
         }
+
+        // Clear the saved selection since we've made changes
+        savedSelectionRef.current = null;
+
+        // Trigger change event
+        handleInput();
+      } catch (error) {
+        console.error("Error executing command:", error);
       }
-      
-      // Clear the saved selection since we've made changes
-      savedSelectionRef.current = null;
-      
-      // Trigger change event
-      handleInput();
-    } catch (error) {
-      console.error('Error executing command:', error);
-    }
-  }, [handleInput, restoreSelection]);
+    },
+    [handleInput, restoreSelection]
+  );
 
   const handleFocus = () => {
     setIsFocused(true);
@@ -256,17 +268,17 @@ export function RichTextarea({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.ctrlKey || e.metaKey) {
       switch (e.key) {
-        case 'b':
+        case "b":
           e.preventDefault();
-          executeCommand('bold');
+          executeCommand("bold");
           break;
-        case 'i':
+        case "i":
           e.preventDefault();
-          executeCommand('italic');
+          executeCommand("italic");
           break;
-        case 'u':
+        case "u":
           e.preventDefault();
-          executeCommand('underline');
+          executeCommand("underline");
           break;
       }
     }
@@ -282,7 +294,7 @@ export function RichTextarea({
           size="sm"
           onMouseDown={(e) => {
             e.preventDefault();
-            executeCommand('bold');
+            executeCommand("bold");
           }}
           className="h-8 w-8 p-0"
         >
@@ -294,7 +306,7 @@ export function RichTextarea({
           size="sm"
           onMouseDown={(e) => {
             e.preventDefault();
-            executeCommand('italic');
+            executeCommand("italic");
           }}
           className="h-8 w-8 p-0"
         >
@@ -306,7 +318,7 @@ export function RichTextarea({
           size="sm"
           onMouseDown={(e) => {
             e.preventDefault();
-            executeCommand('underline');
+            executeCommand("underline");
           }}
           className="h-8 w-8 p-0"
         >
@@ -342,12 +354,12 @@ export function RichTextarea({
 
 // Helper function to convert HTML to plain text
 export function htmlToPlainText(html: string): string {
-  const div = document.createElement('div');
+  const div = document.createElement("div");
   div.innerHTML = html;
-  return div.textContent || div.innerText || '';
+  return div.textContent || div.innerText || "";
 }
 
 // Helper function to convert plain text to HTML
 export function plainTextToHtml(text: string): string {
-  return text.replace(/\n/g, '<br>');
+  return text.replace(/\n/g, "<br>");
 }

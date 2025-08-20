@@ -491,7 +491,7 @@ export function NipPreview({
                   <td className="py-1 px-2 font-normal text-xs text-right w-32">
                     Per Serve
                   </td>
-                  <td className="py-1 px-2 text-center font-normal text-xs">
+                  <td className="py-1 px-2 text-right font-normal text-xs">
                     Per 100g
                   </td>
                 </tr>
@@ -509,15 +509,10 @@ export function NipPreview({
                           ? "italic pl-4"
                           : ""
                       }`}
-                    >
-                      {item.label}
-                    </td>
-                    <td className="py-1 px-2 text-center">
-                      {nutritionalData[item.serveKey]}
-                    </td>
-                    <td className="py-1 px-2 text-center">
-                      {nutritionalData[item.per100gKey]}
-                    </td>
+                      dangerouslySetInnerHTML={{ __html: item.label }}
+                    />
+                    <td className="py-1 px-2 text-right" dangerouslySetInnerHTML={{ __html: nutritionalData[item.serveKey] }} />
+                    <td className="py-1 px-2 text-right" dangerouslySetInnerHTML={{ __html: nutritionalData[item.per100gKey] }} />
                   </tr>
                 ))}
                 {template === "complex" && (
@@ -539,11 +534,9 @@ export function NipPreview({
                           ),
                         }}
                       >
-                        <td className="py-1 px-2">{key}</td>
-                        <td className="py-1 px-2 text-center">{data.serve}</td>
-                        <td className="py-1 px-2 text-center">
-                          {data.per100g}
-                        </td>
+                        <td className="py-1 px-2" dangerouslySetInnerHTML={{ __html: key }} />
+                        <td className="py-1 px-2 text-right" dangerouslySetInnerHTML={{ __html: data.serve }} />
+                        <td className="py-1 px-2 text-right" dangerouslySetInnerHTML={{ __html: data.per100g }} />
                       </tr>
                     ))}
                   </>
@@ -584,8 +577,8 @@ export function NipPreview({
                         borderBottom: getBorderThickness(data.borderThickness),
                       }}
                     >
-                      <td className="py-1 px-2">{key}</td>
-                      <td className="py-1 px-2 text-right">{data.value}</td>
+                      <td className="py-1 px-2" dangerouslySetInnerHTML={{ __html: key }} />
+                      <td className="py-1 px-2 text-right" dangerouslySetInnerHTML={{ __html: data.value }} />
                     </tr>
                   ))}
                   <tr
