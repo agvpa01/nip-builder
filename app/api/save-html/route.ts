@@ -232,7 +232,7 @@ function generateAUComplexHTML(productData: any): string {
               <tbody>
                 <tr style="border-bottom: ${thickBorderStyle}">
                   <td class="py-1 px-2">
-                    Serving Size: ${nutritionalData.servingSize}
+                    Serving Size: ${servingSize}
                   </td>
                   <td></td>
                   <td class="py-1 px-2 text-right">
@@ -362,7 +362,7 @@ function generateUSProteinHTML(productData: any): string {
               <tbody>
                 <tr style="border-bottom: ${thickBorderStyle}">
                   <td class="py-1 px-2">
-                    Serving Size: ${nutritionalData.servingSize}
+                    Serving Size: ${servingSize}
                   </td>
                   <td></td>
                   <td class="py-1 px-2 text-right">
@@ -500,7 +500,7 @@ function generateUSComplexHTML(productData: any): string {
               <tbody>
                 <tr style="border-bottom: ${thickBorderStyle}">
                   <td class="py-1 px-2">
-                    Serving Size: ${nutritionalData.servingSize}
+                    Serving Size: ${servingSize}
                   </td>
                   <td></td>
                   <td class="py-1 px-2 text-right">
@@ -682,7 +682,7 @@ function generateAUProteinHTML(productData: any): string {
               <tbody>
                 <tr style="border-bottom: ${thickBorderStyle}">
                   <td class="py-1 px-2">
-                    Serving Size: ${nutritionalData.servingSize}
+                    Serving Size: ${servingSize}
                   </td>
                   <td></td>
                   <td class="py-1 px-2 text-right">
@@ -812,7 +812,7 @@ function generateAUSupplementsHTML(productData: any): string {
               <tbody>
                 <tr style="border-bottom: ${thickBorderStyle}">
                   <td class="py-1 px-2">
-                    Serving Size: ${nutritionalData.servingSize}
+                    Serving Size: ${servingSize}
                   </td>
                   <td></td>
                   <td class="py-1 px-2 text-right">
@@ -918,7 +918,7 @@ function generateUSDefaultHTML(productData: any): string {
               <tbody>
                 <tr style="border-bottom: ${thickBorderStyle}">
                   <td class="py-1 px-2">
-                    Serving Size: ${nutritionalData.servingSize}
+                    Serving Size: ${servingSize}
                   </td>
                   <td></td>
                   <td class="py-1 px-2 text-right">
@@ -1027,7 +1027,7 @@ function generateAUDefaultHTML(productData: any): string {
               <tbody>
                 <tr style="border-bottom: ${thickBorderStyle}">
                   <td class="py-1 px-2">
-                    Serving Size: ${nutritionalData.servingSize}
+                    Serving Size: ${servingSize}
                   </td>
                   <td></td>
                   <td class="py-1 px-2 text-right">

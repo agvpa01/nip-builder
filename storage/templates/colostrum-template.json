@@ -1,0 +1,182 @@
+{
+  "product": {
+    "title": "Colostrum",
+    "productType": "Protein Powder",
+    "onlineStoreUrl": "colostrum",
+    "htmlStatus": {
+      "hasAU": false,
+      "hasUS": false,
+      "hasAny": false,
+      "filename": "colostrum"
+    }
+  },
+  "template": "supplements",
+  "region": "AU",
+  "directions": "<strong>Add 1 heaped scoop (30g) to 200mL of water or low fat milk</strong>. Stir or shake for 20 seconds, or until completely dispersed.",
+  "servingSize": "30 grams",
+  "ingredients": "Whey Protein Isolate (Milk)(Emulsifier (Soy Lecithin)), Flavour, Xanthan, Sucralose.",
+  "allergenAdvice": "Contains Milk and less than 1% Soy Lecithin (as instantiser).",
+  "storage": "To maximise freshness, keep sealed and store in a cool dry place out of direct sunlight.",
+  "supplementaryInfo": "FORMULATED SUPPLEMENTARY SPORTS FOOD. This product is not to be used as a sole source of nutrition. It must be used in conjunction with a balanced diet and a suitable physical training or exercise program. Not suitable for children under 15 years of age. Not suitable for pregnant women. Should only be used under medical or dietetic supervision.",
+  "servingScoopInfo": "SERVING SCOOP INCLUDED, but may settle to the bottom of the bag during transit. Content sold by weight not volume, some settling may occur.",
+  "consumptionWarning": "CONSUME WITHIN 60 DAYS OF OPENING",
+  "nutritionalData": {
+    "servingSize": "2g",
+    "servingsPerPack": "100",
+    "energy_kj_serve": "0",
+    "energy_kj_100g": "0",
+    "energy_cal_serve": "0",
+    "energy_cal_100g": "0",
+    "protein_serve": "0",
+    "protein_100g": "0",
+    "protein_dv": "53%",
+    "fat_serve": "0",
+    "fat_100g": "0",
+    "fat_dv": "0%",
+    "saturated_fat_serve": "0",
+    "saturated_fat_100g": "0",
+    "saturated_fat_dv": "0%",
+    "carbs_serve": "0",
+    "carbs_100g": "0",
+    "carbs_dv": "1%",
+    "sugars_serve": "0",
+    "sugars_100g": "0",
+    "sodium_serve": "0",
+    "sodium_100g": "0",
+    "sodium_dv": "3%",
+    "gaba_serve": "2,000",
+    "gaba_100g": "100,000",
+    "vitamin_b6_serve": "1.0",
+    "vitamin_b6_100g": "16.1",
+    "folate_serve": "100",
+    "folate_100g": "1,610",
+    "vitamin_b12_serve": "5.0",
+    "vitamin_b12_100g": "80.7",
+    "vitamin_c_serve": "39.0",
+    "vitamin_c_100g": "629",
+    "cholesterol_serve": "0",
+    "cholesterol_dv": "0%",
+    "dietary_fiber_serve": "0",
+    "dietary_fiber_dv": "0%",
+    "total_sugars_serve": "1",
+    "added_sugars_serve": "0",
+    "vitamin_d_serve": "0",
+    "vitamin_d_dv": "0%",
+    "calcium_serve": "130",
+    "calcium_dv": "10%",
+    "iron_serve": "0",
+    "iron_dv": "0%",
+    "potassium_serve": "120",
+    "potassium_dv": "2%"
+  },
+  "aminoAcidData": {
+    "Alanine (mg)": {
+      "value": "5,010",
+      "borderThickness": "light"
+    },
+    "Arginine (mg)": {
+      "value": "2,160",
+      "borderThickness": "light"
+    },
+    "Aspartic acid (mg)": {
+      "value": "10,500",
+      "borderThickness": "light"
+    },
+    "Cysteine (mg)": {
+      "value": "2,430",
+      "borderThickness": "light"
+    },
+    "Glutamic acid (mg)": {
+      "value": "17,000",
+      "borderThickness": "light"
+    },
+    "Glycine (mg)": {
+      "value": "1,620",
+      "borderThickness": "light"
+    },
+    "Histidine (mg)": {
+      "value": "1,550",
+      "borderThickness": "light"
+    },
+    "Isoleucine (mg)*": {
+      "value": "6,340",
+      "borderThickness": "light"
+    },
+    "Leucine (mg)*": {
+      "value": "10,300",
+      "borderThickness": "light"
+    },
+    "Lysine (mg)": {
+      "value": "10,000",
+      "borderThickness": "light"
+    },
+    "Methionine (mg)": {
+      "value": "2,150",
+      "borderThickness": "light"
+    },
+    "Phenylalanine (mg)": {
+      "value": "2,980",
+      "borderThickness": "light"
+    },
+    "Proline (mg)": {
+      "value": "6,050",
+      "borderThickness": "light"
+    },
+    "Serine (mg)": {
+      "value": "4,590",
+      "borderThickness": "light"
+    },
+    "Threonine (mg)": {
+      "value": "6,710",
+      "borderThickness": "light"
+    },
+    "Tryptophan (mg)": {
+      "value": "2,300",
+      "borderThickness": "light"
+    },
+    "Tyrosine (mg)": {
+      "value": "2,840",
+      "borderThickness": "light"
+    },
+    "Valine (mg)*": {
+      "value": "5,450",
+      "borderThickness": "large"
+    }
+  },
+  "compositionalData": {
+    "AAKG (g)": {
+      "serve": "1.7",
+      "per100g": "19.1",
+      "borderThickness": "light"
+    },
+    "Beta Alanine (mg)": {
+      "serve": "1,560",
+      "per100g": "25,100",
+      "borderThickness": "light"
+    },
+    "Arginine (mg)": {
+      "serve": "232",
+      "per100g": "3,740",
+      "borderThickness": "light"
+    },
+    "Citrulline Malate (g)": {
+      "serve": "0.4",
+      "per100g": "7.3",
+      "borderThickness": "light"
+    },
+    "Creatine Monohydrate (g)": {
+      "serve": "1.9",
+      "per100g": "30.3",
+      "borderThickness": "light"
+    },
+    "L-Tyrosine (mg)": {
+      "serve": "97",
+      "per100g": "1,560",
+      "borderThickness": "light"
+    }
+  },
+  "borderThickness": [
+    1
+  ],
+  "savedAt": "2025-08-20T02:02:47.412Z"
+}

@@ -74,6 +74,7 @@ type Template = "protein" | "supplements" | "complex";
 export function NipBuilder({ product, template }: NipBuilderProps) {
   const [showPreview, setShowPreview] = useState(false);
   const [borderThickness, setBorderThickness] = useState([1]);
+  const [isSavingHTML, setIsSavingHTML] = useState(false);
   const [region, setRegion] = useState<Region>("AU");
 
   const [directions, setDirections] = useState(
@@ -604,6 +605,7 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
   };
 
   const handleSaveHTML = async () => {
+    setIsSavingHTML(true);
     try {
       // Extract filename from onlineStoreUrl
       const filename = product.onlineStoreUrl
@@ -695,58 +697,12 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
     } catch (error) {
       console.error("Error saving HTML:", error);
       alert("Error saving HTML");
+    } finally {
+      setIsSavingHTML(false);
     }
   };
 
-  const handleSaveTemplate = async () => {
-    try {
-      // Extract filename from onlineStoreUrl
-      const filename = product.onlineStoreUrl
-        .replace(/[^a-zA-Z0-9]/g, "-")
-        .toLowerCase();
 
-      // Prepare template data
-      const templateData = {
-        product,
-        template,
-        region,
-        directions,
-        servingSize,
-        ingredients,
-        allergenAdvice,
-        storage,
-        supplementaryInfo,
-        servingScoopInfo,
-        consumptionWarning,
-        nutritionalData,
-        aminoAcidData,
-        compositionalData,
-        borderThickness,
-        savedAt: new Date().toISOString(),
-      };
-
-      const response = await fetch("/api/save-template", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          filename,
-          templateData,
-        }),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        alert(`Template saved successfully! File: ${result.filename}`);
-      } else {
-        alert("Failed to save template");
-      }
-    } catch (error) {
-      console.error("Error saving template:", error);
-      alert("Error saving template");
-    }
-  };
 
   if (showPreview) {
     return (
@@ -756,10 +712,14 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
             <Eye className="w-4 h-4 mr-2" />
             Back to Editor
           </Button>
-          <Button onClick={handleSaveTemplate} variant="secondary">
-            <Save className="w-4 h-4 mr-2" />
-            Save Template
-          </Button>
+          <Button 
+             onClick={handleSaveHTML} 
+             variant="secondary"
+             disabled={isSavingHTML}
+           >
+             <Save className="w-4 h-4 mr-2" />
+             {isSavingHTML ? "Saving..." : "Save HTML"}
+           </Button>
           <Button onClick={handleSaveHTML}>
             <Download className="w-4 h-4 mr-2" />
             Save HTML
@@ -794,10 +754,14 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
           <Eye className="w-4 h-4 mr-2" />
           Preview NIP
         </Button>
-        <Button onClick={handleSaveTemplate} variant="secondary">
-          <Save className="w-4 h-4 mr-2" />
-          Save Template
-        </Button>
+        <Button 
+           onClick={handleSaveHTML} 
+           variant="secondary"
+           disabled={isSavingHTML}
+         >
+           <Save className="w-4 h-4 mr-2" />
+           {isSavingHTML ? "Saving..." : "Save HTML"}
+         </Button>
 
         <div className="flex gap-2">
           <Button
@@ -837,10 +801,12 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
 
             <div>
               <Label htmlFor="serving-size">Serving Size</Label>
-              <Input
+              <RichTextarea
                 id="serving-size"
                 value={servingSize}
-                onChange={(e) => setServingSize(e.target.value)}
+                onChange={setServingSize}
+                rows={1}
+                placeholder="Enter serving size with formatting..."
               />
             </div>
 
@@ -902,10 +868,12 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
             {template === "complex" && (
               <div>
                 <Label htmlFor="consumption-warning">Consumption Warning</Label>
-                <Input
+                <RichTextarea
                   id="consumption-warning"
                   value={consumptionWarning}
-                  onChange={(e) => setConsumptionWarning(e.target.value)}
+                  onChange={setConsumptionWarning}
+                  rows={1}
+                  placeholder="Enter consumption warning with formatting..."
                 />
               </div>
             )}

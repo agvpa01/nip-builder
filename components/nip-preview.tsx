@@ -333,7 +333,7 @@ export function NipPreview({
             </div>
             <div>
               <h3 className="font-bold text-base mb-2">SERVING SIZE:</h3>
-              <p>{servingSize}</p>
+              <div dangerouslySetInnerHTML={{ __html: servingSize }} />
             </div>
             <div>
               <h3 className="font-bold text-base mb-2">INGREDIENTS:</h3>
@@ -439,7 +439,7 @@ export function NipPreview({
             </div>
             <div>
               <h3 className="font-bold text-base mb-2">SERVING SIZE:</h3>
-              <p>{servingSize}</p>
+              <div dangerouslySetInnerHTML={{ __html: servingSize }} />
             </div>
             <div>
               <h3 className="font-bold text-base mb-2">INGREDIENTS:</h3>
@@ -559,7 +559,7 @@ export function NipPreview({
               </div>
               {consumptionWarning && (
                 <div className="border-2 border-black text-center py-2 px-4 font-bold text-xs">
-                  {consumptionWarning}
+                  <div dangerouslySetInnerHTML={{ __html: consumptionWarning }} />
                 </div>
               )}
             </div>
