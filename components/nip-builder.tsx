@@ -5,9 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { RichTextarea } from "@/components/ui/rich-textarea";
 import { Label } from "@/components/ui/label";
 import { NipPreview } from "@/components/nip-preview";
-import { Download, Eye, Plus, Trash2 } from "lucide-react";
+import { Download, Eye, Plus, Trash2, Save } from "lucide-react";
 
 interface Product {
   title: string;
@@ -610,10 +611,10 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
         .toLowerCase();
 
       // Check if HTML file already exists
-      const checkResponse = await fetch('/api/check-html', {
-        method: 'POST',
+      const checkResponse = await fetch("/api/check-html", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ products: [product] }),
       });
@@ -622,13 +623,17 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
         const checkData = await checkResponse.json();
         if (checkData.success && checkData.products[0]?.htmlStatus?.hasAny) {
           const existingRegions = [];
-          if (checkData.products[0].htmlStatus.hasAU) existingRegions.push('AU');
-          if (checkData.products[0].htmlStatus.hasUS) existingRegions.push('US');
-          
+          if (checkData.products[0].htmlStatus.hasAU)
+            existingRegions.push("AU");
+          if (checkData.products[0].htmlStatus.hasUS)
+            existingRegions.push("US");
+
           const confirmOverwrite = confirm(
-            `An HTML file already exists for this product in the following region(s): ${existingRegions.join(', ')}. Do you want to overwrite it?`
+            `An HTML file already exists for this product in the following region(s): ${existingRegions.join(
+              ", "
+            )}. Do you want to overwrite it?`
           );
-          
+
           if (!confirmOverwrite) {
             return; // User cancelled, don't save
           }
@@ -693,6 +698,56 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
     }
   };
 
+  const handleSaveTemplate = async () => {
+    try {
+      // Extract filename from onlineStoreUrl
+      const filename = product.onlineStoreUrl
+        .replace(/[^a-zA-Z0-9]/g, "-")
+        .toLowerCase();
+
+      // Prepare template data
+      const templateData = {
+        product,
+        template,
+        region,
+        directions,
+        servingSize,
+        ingredients,
+        allergenAdvice,
+        storage,
+        supplementaryInfo,
+        servingScoopInfo,
+        consumptionWarning,
+        nutritionalData,
+        aminoAcidData,
+        compositionalData,
+        borderThickness,
+        savedAt: new Date().toISOString(),
+      };
+
+      const response = await fetch("/api/save-template", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          filename,
+          templateData,
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        alert(`Template saved successfully! File: ${result.filename}`);
+      } else {
+        alert("Failed to save template");
+      }
+    } catch (error) {
+      console.error("Error saving template:", error);
+      alert("Error saving template");
+    }
+  };
+
   if (showPreview) {
     return (
       <div className="w-full">
@@ -700,6 +755,10 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
           <Button onClick={() => setShowPreview(false)} variant="outline">
             <Eye className="w-4 h-4 mr-2" />
             Back to Editor
+          </Button>
+          <Button onClick={handleSaveTemplate} variant="secondary">
+            <Save className="w-4 h-4 mr-2" />
+            Save Template
           </Button>
           <Button onClick={handleSaveHTML}>
             <Download className="w-4 h-4 mr-2" />
@@ -735,6 +794,10 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
           <Eye className="w-4 h-4 mr-2" />
           Preview NIP
         </Button>
+        <Button onClick={handleSaveTemplate} variant="secondary">
+          <Save className="w-4 h-4 mr-2" />
+          Save Template
+        </Button>
 
         <div className="flex gap-2">
           <Button
@@ -763,11 +826,12 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="directions">Directions</Label>
-              <Textarea
+              <RichTextarea
                 id="directions"
                 value={directions}
-                onChange={(e) => setDirections(e.target.value)}
+                onChange={setDirections}
                 rows={3}
+                placeholder="Enter directions with formatting..."
               />
             </div>
 
@@ -782,51 +846,56 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
 
             <div>
               <Label htmlFor="ingredients">Ingredients</Label>
-              <Textarea
+              <RichTextarea
                 id="ingredients"
                 value={ingredients}
-                onChange={(e) => setIngredients(e.target.value)}
+                onChange={setIngredients}
                 rows={3}
+                placeholder="Enter ingredients with formatting..."
               />
             </div>
 
             <div>
               <Label htmlFor="allergen">Allergen Advice</Label>
-              <Textarea
+              <RichTextarea
                 id="allergen"
                 value={allergenAdvice}
-                onChange={(e) => setAllergenAdvice(e.target.value)}
+                onChange={setAllergenAdvice}
                 rows={2}
+                placeholder="Enter allergen advice with formatting..."
               />
             </div>
 
             <div>
               <Label htmlFor="storage">Storage</Label>
-              <Textarea
+              <RichTextarea
                 id="storage"
                 value={storage}
-                onChange={(e) => setStorage(e.target.value)}
+                onChange={setStorage}
                 rows={3}
+                placeholder="Enter storage instructions with formatting..."
               />
             </div>
 
             <div>
               <Label htmlFor="supplementary">Supplementary Info</Label>
-              <Textarea
+              <RichTextarea
                 id="supplementary"
                 value={supplementaryInfo}
-                onChange={(e) => setSupplementaryInfo(e.target.value)}
+                onChange={setSupplementaryInfo}
                 rows={4}
+                placeholder="Enter supplementary information with formatting..."
               />
             </div>
 
             <div>
               <Label htmlFor="serving-scoop">Serving Scoop Info</Label>
-              <Textarea
+              <RichTextarea
                 id="serving-scoop"
                 value={servingScoopInfo}
-                onChange={(e) => setServingScoopInfo(e.target.value)}
+                onChange={setServingScoopInfo}
                 rows={3}
+                placeholder="Enter serving scoop information with formatting..."
               />
             </div>
 

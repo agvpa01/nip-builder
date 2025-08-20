@@ -161,30 +161,30 @@ function generateUSSupplementsHTML(productData: any): string {
       
       <div class="mb-4">
         <h3 class="font-bold mb-2">Directions:</h3>
-        <p>${directions}</p>
+        <div>${directions}</div>
       </div>
       
       <div class="mb-4">
         <h3 class="font-bold mb-2">Ingredients:</h3>
-        <p>${ingredients}</p>
+        <div>${ingredients}</div>
       </div>
       
       <div class="mb-4">
         <h3 class="font-bold mb-2">Allergen Advice:</h3>
-        <p>${allergenAdvice}</p>
+        <div>${allergenAdvice}</div>
       </div>
       
       <div class="mb-4">
         <h3 class="font-bold mb-2">Storage:</h3>
-        <p>${storage}</p>
+        <div>${storage}</div>
       </div>
       
       <div class="mb-4">
-        <p class="text-xs">${supplementaryInfo}</p>
+        <div class="text-xs">${supplementaryInfo}</div>
       </div>
       
       <div>
-        <p class="text-xs font-bold">${servingScoopInfo}</p>
+        <div class="text-xs font-bold">${servingScoopInfo}</div>
       </div>
     </div>
   `;
@@ -281,7 +281,7 @@ function generateAUComplexHTML(productData: any): string {
           <div class="space-y-4 mt-6 w-full">
             <div>
               <h3 class="font-bold text-base mb-2">INGREDIENTS:</h3>
-              <p class="text-sm">${ingredients}</p>
+              <div class="text-sm">${ingredients}</div>
             </div>
             ${consumptionWarning ? `<div class="border-2 border-black text-center py-2 px-4 font-bold text-xs">
               ${consumptionWarning}
@@ -292,30 +292,30 @@ function generateAUComplexHTML(productData: any): string {
       
       <div class="mb-4">
         <h3 class="font-bold mb-2">Directions:</h3>
-        <p>${directions}</p>
+        <div>${directions}</div>
       </div>
       
       <div class="mb-4">
         <h3 class="font-bold mb-2">Ingredients:</h3>
-        <p>${ingredients}</p>
+        <div>${ingredients}</div>
       </div>
       
       <div class="mb-4">
         <h3 class="font-bold mb-2">Allergen Advice:</h3>
-        <p>${allergenAdvice}</p>
+        <div>${allergenAdvice}</div>
       </div>
       
       <div class="mb-4">
         <h3 class="font-bold mb-2">Storage:</h3>
-        <p>${storage}</p>
+        <div>${storage}</div>
       </div>
       
       <div class="mb-4">
-        <p class="text-xs">${supplementaryInfo}</p>
+        <div class="text-xs">${supplementaryInfo}</div>
       </div>
       
       <div>
-        <p class="text-xs font-bold">${servingScoopInfo}</p>
+        <div class="text-xs font-bold">${servingScoopInfo}</div>
       </div>
     </div>
   `;
@@ -429,30 +429,30 @@ function generateUSProteinHTML(productData: any): string {
       
       <div class="mb-4">
         <h3 class="font-bold mb-2">Directions:</h3>
-        <p>${directions}</p>
+        <div>${directions}</div>
       </div>
       
       <div class="mb-4">
         <h3 class="font-bold mb-2">Ingredients:</h3>
-        <p>${ingredients}</p>
+        <div>${ingredients}</div>
       </div>
       
       <div class="mb-4">
         <h3 class="font-bold mb-2">Allergen Advice:</h3>
-        <p>${allergenAdvice}</p>
+        <div>${allergenAdvice}</div>
       </div>
       
       <div class="mb-4">
         <h3 class="font-bold mb-2">Storage:</h3>
-        <p>${storage}</p>
+        <div>${storage}</div>
       </div>
       
       <div class="mb-4">
-        <p class="text-xs">${supplementaryInfo}</p>
+        <div class="text-xs">${supplementaryInfo}</div>
       </div>
       
       <div>
-        <p class="text-xs font-bold">${servingScoopInfo}</p>
+        <div class="text-xs font-bold">${servingScoopInfo}</div>
       </div>
     </div>
   `;
@@ -569,7 +569,7 @@ function generateUSComplexHTML(productData: any): string {
               CONSUMPTION WARNING
             </div>
             <div class="border border-red-600 p-4">
-              <p class="text-sm">${consumptionWarning}</p>
+              <div class="text-sm">${consumptionWarning}</div>
             </div>
           </div>
         ` : ''}
@@ -577,35 +577,35 @@ function generateUSComplexHTML(productData: any): string {
       
       <div class="mb-4">
         <h3 class="font-bold mb-2">Directions:</h3>
-        <p>${directions}</p>
+        <div>${directions}</div>
       </div>
       
       ${consumptionWarning ? `<div class="mb-4">
         <h3 class="font-bold mb-2">Warning:</h3>
-        <p class="text-red-600">${consumptionWarning}</p>
+        <div class="text-red-600">${consumptionWarning}</div>
       </div>` : ''}
       
       <div class="mb-4">
         <h3 class="font-bold mb-2">Ingredients:</h3>
-        <p>${ingredients}</p>
+        <div>${ingredients}</div>
       </div>
       
       <div class="mb-4">
         <h3 class="font-bold mb-2">Allergen Advice:</h3>
-        <p>${allergenAdvice}</p>
+        <div>${allergenAdvice}</div>
       </div>
       
       <div class="mb-4">
         <h3 class="font-bold mb-2">Storage:</h3>
-        <p>${storage}</p>
+        <div>${storage}</div>
       </div>
       
       <div class="mb-4">
-        <p class="text-xs">${supplementaryInfo}</p>
+        <div class="text-xs">${supplementaryInfo}</div>
       </div>
       
       <div>
-        <p class="text-xs font-bold">${servingScoopInfo}</p>
+        <div class="text-xs font-bold">${servingScoopInfo}</div>
       </div>
     </div>
   `;
@@ -646,7 +646,7 @@ function generateAUProteinHTML(productData: any): string {
         <div class="space-y-4 w-full">
           <div>
             <h3 class="font-bold text-base mb-2">DIRECTIONS:</h3>
-            <p>${directions}</p>
+            <div>${directions}</div>
           </div>
           <div>
             <h3 class="font-bold text-base mb-2">SERVING SIZE:</h3>
@@ -654,23 +654,23 @@ function generateAUProteinHTML(productData: any): string {
           </div>
           <div>
             <h3 class="font-bold text-base mb-2">INGREDIENTS:</h3>
-            <p>${ingredients}</p>
+            <div>${ingredients}</div>
           </div>
           <div>
             <h3 class="font-bold text-base mb-2">ALLERGEN ADVICE:</h3>
-            <p>${allergenAdvice}</p>
+            <div>${allergenAdvice}</div>
           </div>
           <div>
             <h3 class="font-bold text-base mb-2">STORAGE:</h3>
-            <p>${storage}</p>
+            <div>${storage}</div>
           </div>
           <div>
             <h3 class="font-bold text-base mb-2">FORMULATED SUPPLEMENTARY SPORTS FOOD.</h3>
-            <p>${supplementaryInfo}</p>
+            <div>${supplementaryInfo}</div>
           </div>
           <div>
             <h3 class="font-bold text-base mb-2">SERVING SCOOP INCLUDED,</h3>
-            <p>${servingScoopInfo}</p>
+            <div>${servingScoopInfo}</div>
           </div>
         </div>
         <div class="w-full">
@@ -743,30 +743,30 @@ function generateAUProteinHTML(productData: any): string {
       
       <div class="mb-4">
         <h3 class="font-bold mb-2">Directions:</h3>
-        <p>${directions}</p>
+        <div>${directions}</div>
       </div>
       
       <div class="mb-4">
         <h3 class="font-bold mb-2">Ingredients:</h3>
-        <p>${ingredients}</p>
+        <div>${ingredients}</div>
       </div>
       
       <div class="mb-4">
         <h3 class="font-bold mb-2">Allergen Advice:</h3>
-        <p>${allergenAdvice}</p>
+        <div>${allergenAdvice}</div>
       </div>
       
       <div class="mb-4">
         <h3 class="font-bold mb-2">Storage:</h3>
-        <p>${storage}</p>
+        <div>${storage}</div>
       </div>
       
       <div class="mb-4">
-        <p class="text-xs">${supplementaryInfo}</p>
+        <div class="text-xs">${supplementaryInfo}</div>
       </div>
       
       <div>
-        <p class="text-xs font-bold">${servingScoopInfo}</p>
+        <div class="text-xs font-bold">${servingScoopInfo}</div>
       </div>
     </div>
   `;
@@ -849,30 +849,30 @@ function generateAUSupplementsHTML(productData: any): string {
       
       <div class="mb-4">
         <h3 class="font-bold mb-2">Directions:</h3>
-        <p>${directions}</p>
+        <div>${directions}</div>
       </div>
       
       <div class="mb-4">
         <h3 class="font-bold mb-2">Ingredients:</h3>
-        <p>${ingredients}</p>
+        <div>${ingredients}</div>
       </div>
       
       <div class="mb-4">
         <h3 class="font-bold mb-2">Allergen Advice:</h3>
-        <p>${allergenAdvice}</p>
+        <div>${allergenAdvice}</div>
       </div>
       
       <div class="mb-4">
         <h3 class="font-bold mb-2">Storage:</h3>
-        <p>${storage}</p>
+        <div>${storage}</div>
       </div>
       
       <div class="mb-4">
-        <p class="text-xs">${supplementaryInfo}</p>
+        <div class="text-xs">${supplementaryInfo}</div>
       </div>
       
       <div>
-        <p class="text-xs font-bold">${servingScoopInfo}</p>
+        <div class="text-xs font-bold">${servingScoopInfo}</div>
       </div>
     </div>
   `;
@@ -958,30 +958,30 @@ function generateUSDefaultHTML(productData: any): string {
       
       <div class="mb-4">
         <h3 class="font-bold mb-2">Directions:</h3>
-        <p>${directions}</p>
+        <div>${directions}</div>
       </div>
       
       <div class="mb-4">
         <h3 class="font-bold mb-2">Ingredients:</h3>
-        <p>${ingredients}</p>
+        <div>${ingredients}</div>
       </div>
       
       <div class="mb-4">
         <h3 class="font-bold mb-2">Allergen Advice:</h3>
-        <p>${allergenAdvice}</p>
+        <div>${allergenAdvice}</div>
       </div>
       
       <div class="mb-4">
         <h3 class="font-bold mb-2">Storage:</h3>
-        <p>${storage}</p>
+        <div>${storage}</div>
       </div>
       
       <div class="mb-4">
-        <p class="text-xs">${supplementaryInfo}</p>
+        <div class="text-xs">${supplementaryInfo}</div>
       </div>
       
       <div>
-        <p class="text-xs font-bold">${servingScoopInfo}</p>
+        <div class="text-xs font-bold">${servingScoopInfo}</div>
       </div>
     </div>
   `;

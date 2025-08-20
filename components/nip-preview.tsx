@@ -329,7 +329,7 @@ export function NipPreview({
           <div className="space-y-4">
             <div>
               <h3 className="font-bold text-base mb-2">DIRECTIONS:</h3>
-              <p>{directions}</p>
+              <div dangerouslySetInnerHTML={{ __html: directions }} />
             </div>
             <div>
               <h3 className="font-bold text-base mb-2">SERVING SIZE:</h3>
@@ -337,27 +337,27 @@ export function NipPreview({
             </div>
             <div>
               <h3 className="font-bold text-base mb-2">INGREDIENTS:</h3>
-              <p>{ingredients}</p>
+              <div dangerouslySetInnerHTML={{ __html: ingredients }} />
             </div>
             <div>
               <h3 className="font-bold text-base mb-2">ALLERGEN ADVICE:</h3>
-              <p>{allergenAdvice}</p>
+              <div dangerouslySetInnerHTML={{ __html: allergenAdvice }} />
             </div>
             <div>
               <h3 className="font-bold text-base mb-2">STORAGE:</h3>
-              <p>{storage}</p>
+              <div dangerouslySetInnerHTML={{ __html: storage }} />
             </div>
             <div>
               <h3 className="font-bold text-base mb-2">
                 FORMULATED SUPPLEMENTARY SPORTS FOOD.
               </h3>
-              <p>{supplementaryInfo}</p>
+              <div dangerouslySetInnerHTML={{ __html: supplementaryInfo }} />
             </div>
             <div>
               <h3 className="font-bold text-base mb-2">
                 SERVING SCOOP INCLUDED,
               </h3>
-              <p>{servingScoopInfo}</p>
+              <div dangerouslySetInnerHTML={{ __html: servingScoopInfo }} />
             </div>
           </div>
           <div className="space-y-6">
@@ -435,7 +435,7 @@ export function NipPreview({
           <div className="space-y-4 w-full">
             <div>
               <h3 className="font-bold text-base mb-2">DIRECTIONS:</h3>
-              <p>{directions}</p>
+              <div dangerouslySetInnerHTML={{ __html: directions }} />
             </div>
             <div>
               <h3 className="font-bold text-base mb-2">SERVING SIZE:</h3>
@@ -443,27 +443,27 @@ export function NipPreview({
             </div>
             <div>
               <h3 className="font-bold text-base mb-2">INGREDIENTS:</h3>
-              <p>{ingredients}</p>
+              <div dangerouslySetInnerHTML={{ __html: ingredients }} />
             </div>
             <div>
               <h3 className="font-bold text-base mb-2">ALLERGEN ADVICE:</h3>
-              <p>{allergenAdvice}</p>
+              <div dangerouslySetInnerHTML={{ __html: allergenAdvice }} />
             </div>
             <div>
               <h3 className="font-bold text-base mb-2">STORAGE:</h3>
-              <p>{storage}</p>
+              <div dangerouslySetInnerHTML={{ __html: storage }} />
             </div>
             <div>
               <h3 className="font-bold text-base mb-2">
                 FORMULATED SUPPLEMENTARY SPORTS FOOD.
               </h3>
-              <p>{supplementaryInfo}</p>
+              <div dangerouslySetInnerHTML={{ __html: supplementaryInfo }} />
             </div>
             <div>
               <h3 className="font-bold text-base mb-2">
                 SERVING SCOOP INCLUDED,
               </h3>
-              <p>{servingScoopInfo}</p>
+              <div dangerouslySetInnerHTML={{ __html: servingScoopInfo }} />
             </div>
           </div>
         )}
@@ -555,7 +555,7 @@ export function NipPreview({
             <div className="space-y-4 mt-6 w-full">
               <div>
                 <h3 className="font-bold text-base mb-2">INGREDIENTS:</h3>
-                <p className="text-sm">{ingredients}</p>
+                <div className="text-sm" dangerouslySetInnerHTML={{ __html: ingredients }} />
               </div>
               {consumptionWarning && (
                 <div className="border-2 border-black text-center py-2 px-4 font-bold text-xs">
