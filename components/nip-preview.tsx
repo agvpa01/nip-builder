@@ -35,12 +35,16 @@ interface AminoAcidData {
   };
 }
 
+interface CompositionalItem {
+  id: string;
+  name: string;
+  serve: string;
+  per100g: string;
+  borderThickness: "light" | "medium" | "large" | "xl" | "2xl";
+}
+
 interface CompositionalData {
-  [key: string]: {
-    serve: string;
-    per100g: string;
-    borderThickness: "light" | "medium" | "large" | "xl" | "2xl";
-  };
+  [key: string]: CompositionalItem;
 }
 
 interface NutritionalItem {
@@ -52,6 +56,13 @@ interface NutritionalItem {
   borderThickness?: "light" | "medium" | "large" | "xl" | "2xl";
 }
 
+interface TextSectionData {
+  id: string;
+  label: string;
+  value: string;
+  displayLabel: string;
+}
+
 interface NipPreviewProps {
   product: Product;
   directions: string;
@@ -61,6 +72,7 @@ interface NipPreviewProps {
   storage: string;
   supplementaryInfo: string;
   servingScoopInfo: string;
+  textSections?: TextSectionData[];
   nutritionalData: NutritionalData;
   aminoAcidData: AminoAcidData;
   compositionalData?: CompositionalData;
@@ -80,6 +92,7 @@ export function NipPreview({
   storage,
   supplementaryInfo,
   servingScoopInfo,
+  textSections = [],
   nutritionalData,
   aminoAcidData,
   compositionalData = {},
@@ -433,38 +446,50 @@ export function NipPreview({
       >
         {template === "protein" && (
           <div className="space-y-4 w-full">
-            <div>
-              <h3 className="font-bold text-base mb-2">DIRECTIONS:</h3>
-              <div dangerouslySetInnerHTML={{ __html: directions }} />
-            </div>
-            <div>
-              <h3 className="font-bold text-base mb-2">SERVING SIZE:</h3>
-              <div dangerouslySetInnerHTML={{ __html: servingSize }} />
-            </div>
-            <div>
-              <h3 className="font-bold text-base mb-2">INGREDIENTS:</h3>
-              <div dangerouslySetInnerHTML={{ __html: ingredients }} />
-            </div>
-            <div>
-              <h3 className="font-bold text-base mb-2">ALLERGEN ADVICE:</h3>
-              <div dangerouslySetInnerHTML={{ __html: allergenAdvice }} />
-            </div>
-            <div>
-              <h3 className="font-bold text-base mb-2">STORAGE:</h3>
-              <div dangerouslySetInnerHTML={{ __html: storage }} />
-            </div>
-            <div>
-              <h3 className="font-bold text-base mb-2">
-                FORMULATED SUPPLEMENTARY SPORTS FOOD.
-              </h3>
-              <div dangerouslySetInnerHTML={{ __html: supplementaryInfo }} />
-            </div>
-            <div>
-              <h3 className="font-bold text-base mb-2">
-                SERVING SCOOP INCLUDED,
-              </h3>
-              <div dangerouslySetInnerHTML={{ __html: servingScoopInfo }} />
-            </div>
+            {textSections.length > 0 ? (
+              textSections.map((section) => (
+                <div key={section.id}>
+                  <h3 className="font-bold text-base mb-2">{section.displayLabel}:</h3>
+                  <div dangerouslySetInnerHTML={{ __html: section.value }} />
+                </div>
+              ))
+            ) : (
+              // Fallback to original hardcoded order if textSections not provided
+              <>
+                <div>
+                  <h3 className="font-bold text-base mb-2">DIRECTIONS:</h3>
+                  <div dangerouslySetInnerHTML={{ __html: directions }} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-base mb-2">SERVING SIZE:</h3>
+                  <div dangerouslySetInnerHTML={{ __html: servingSize }} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-base mb-2">INGREDIENTS:</h3>
+                  <div dangerouslySetInnerHTML={{ __html: ingredients }} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-base mb-2">ALLERGEN ADVICE:</h3>
+                  <div dangerouslySetInnerHTML={{ __html: allergenAdvice }} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-base mb-2">STORAGE:</h3>
+                  <div dangerouslySetInnerHTML={{ __html: storage }} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-base mb-2">
+                    FORMULATED SUPPLEMENTARY SPORTS FOOD.
+                  </h3>
+                  <div dangerouslySetInnerHTML={{ __html: supplementaryInfo }} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-base mb-2">
+                    SERVING SCOOP INCLUDED,
+                  </h3>
+                  <div dangerouslySetInnerHTML={{ __html: servingScoopInfo }} />
+                </div>
+              </>
+            )}
           </div>
         )}
         <div className="w-full ">
@@ -535,9 +560,9 @@ export function NipPreview({
                         COMPOSITIONAL INFORMATION
                       </td>
                     </tr>
-                    {Object.entries(compositionalData).map(([key, data]) => (
+                    {Object.entries(compositionalData).map(([id, data]) => (
                       <tr
-                        key={key}
+                        key={data.id}
                         style={{
                           borderBottom: getBorderThickness(
                             data.borderThickness
@@ -546,7 +571,7 @@ export function NipPreview({
                       >
                         <td
                           className="py-1 px-2"
-                          dangerouslySetInnerHTML={{ __html: key }}
+                          dangerouslySetInnerHTML={{ __html: data.name }}
                         />
                         <td
                           className="py-1 px-2 text-right"
@@ -565,13 +590,27 @@ export function NipPreview({
           </div>
           {template === "complex" && (
             <div className="space-y-4 mt-6 w-full">
-              <div>
-                <h3 className="font-bold text-base mb-2">INGREDIENTS:</h3>
-                <div
-                  className="text-sm"
-                  dangerouslySetInnerHTML={{ __html: ingredients }}
-                />
-              </div>
+              {textSections.length > 0 ? (
+                textSections
+                  .filter(section => section.id === "ingredients")
+                  .map((section) => (
+                    <div key={section.id}>
+                      <h3 className="font-bold text-base mb-2">{section.displayLabel}:</h3>
+                      <div
+                        className="text-sm"
+                        dangerouslySetInnerHTML={{ __html: section.value }}
+                      />
+                    </div>
+                  ))
+              ) : (
+                <div>
+                  <h3 className="font-bold text-base mb-2">INGREDIENTS:</h3>
+                  <div
+                    className="text-sm"
+                    dangerouslySetInnerHTML={{ __html: ingredients }}
+                  />
+                </div>
+              )}
               {consumptionWarning && (
                 <div className="border-2 border-black text-center py-2 px-4 font-bold text-xs">
                   <div

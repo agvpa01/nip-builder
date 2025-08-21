@@ -159,33 +159,46 @@ function generateUSSupplementsHTML(productData: any): string {
         </table>
       </div>
       
-      <div class="mb-4">
-        <h3 class="font-bold mb-2">Directions:</h3>
-        <div>${directions}</div>
-      </div>
-      
-      <div class="mb-4">
-        <h3 class="font-bold mb-2">Ingredients:</h3>
-        <div>${ingredients}</div>
-      </div>
-      
-      <div class="mb-4">
-        <h3 class="font-bold mb-2">Allergen Advice:</h3>
-        <div>${allergenAdvice}</div>
-      </div>
-      
-      <div class="mb-4">
-        <h3 class="font-bold mb-2">Storage:</h3>
-        <div>${storage}</div>
-      </div>
-      
-      <div class="mb-4">
-        <div class="text-xs">${supplementaryInfo}</div>
-      </div>
-      
-      <div>
-        <div class="text-xs font-bold">${servingScoopInfo}</div>
-      </div>
+      ${textSections && textSections.length > 0 
+        ? textSections.map((section: any) => {
+            if (section.id === 'supplementaryInfo') {
+              return `<div class="mb-4"><div class="text-xs">${section.value}</div></div>`;
+            } else if (section.id === 'servingScoopInfo') {
+              return `<div><div class="text-xs font-bold">${section.value}</div></div>`;
+            } else {
+              return `<div class="mb-4"><h3 class="font-bold mb-2">${section.displayLabel}:</h3><div>${section.value}</div></div>`;
+            }
+          }).join('')
+        : `
+          <div class="mb-4">
+            <h3 class="font-bold mb-2">Directions:</h3>
+            <div>${directions}</div>
+          </div>
+          
+          <div class="mb-4">
+            <h3 class="font-bold mb-2">Ingredients:</h3>
+            <div>${ingredients}</div>
+          </div>
+          
+          <div class="mb-4">
+            <h3 class="font-bold mb-2">Allergen Advice:</h3>
+            <div>${allergenAdvice}</div>
+          </div>
+          
+          <div class="mb-4">
+            <h3 class="font-bold mb-2">Storage:</h3>
+            <div>${storage}</div>
+          </div>
+          
+          <div class="mb-4">
+            <div class="text-xs">${supplementaryInfo}</div>
+          </div>
+          
+          <div>
+            <div class="text-xs font-bold">${servingScoopInfo}</div>
+          </div>
+        `
+      }
     </div>
   `;
 }
@@ -200,6 +213,7 @@ function generateAUComplexHTML(productData: any): string {
     storage,
     supplementaryInfo,
     servingScoopInfo,
+    textSections,
     nutritionalData,
     compositionalData,
     consumptionWarning,
@@ -286,11 +300,11 @@ function generateAUComplexHTML(productData: any): string {
                   </tr>
                   ${Object.entries(compositionalData)
                     .map(
-                      ([key, data]: [string, any]) => `
+                      ([id, data]: [string, any]) => `
                     <tr style="border-bottom: ${getBorderThickness(
                       data.borderThickness
                     )}">
-                      <td class="py-1 px-2">${key}</td>
+                      <td class="py-1 px-2">${data.name}</td>
                       <td class="py-1 px-2 text-center">${data.serve}</td>
                       <td class="py-1 px-2 text-center">${data.per100g}</td>
                     </tr>
@@ -304,10 +318,20 @@ function generateAUComplexHTML(productData: any): string {
             </table>
           </div>
           <div class="space-y-4 mt-6 w-full">
-            <div>
-              <h3 class="font-bold text-base mb-2">INGREDIENTS:</h3>
-              <div class="text-sm">${ingredients}</div>
-            </div>
+            ${textSections && textSections.length > 0 
+              ? textSections.map((section: any) => `
+                <div>
+                  <h3 class="font-bold text-base mb-2">${section.displayLabel}:</h3>
+                  <div class="text-sm">${section.value}</div>
+                </div>
+              `).join('')
+              : `
+                <div>
+                  <h3 class="font-bold text-base mb-2">INGREDIENTS:</h3>
+                  <div class="text-sm">${ingredients}</div>
+                </div>
+              `
+            }
             ${
               consumptionWarning
                 ? `<div class="border-2 border-black text-center py-2 px-4 font-bold text-xs">
@@ -319,33 +343,46 @@ function generateAUComplexHTML(productData: any): string {
         </div>
       </div>
       
-      <div class="mb-4">
-        <h3 class="font-bold mb-2">Directions:</h3>
-        <div>${directions}</div>
-      </div>
-      
-      <div class="mb-4">
-        <h3 class="font-bold mb-2">Ingredients:</h3>
-        <div>${ingredients}</div>
-      </div>
-      
-      <div class="mb-4">
-        <h3 class="font-bold mb-2">Allergen Advice:</h3>
-        <div>${allergenAdvice}</div>
-      </div>
-      
-      <div class="mb-4">
-        <h3 class="font-bold mb-2">Storage:</h3>
-        <div>${storage}</div>
-      </div>
-      
-      <div class="mb-4">
-        <div class="text-xs">${supplementaryInfo}</div>
-      </div>
-      
-      <div>
-        <div class="text-xs font-bold">${servingScoopInfo}</div>
-      </div>
+      ${textSections && textSections.length > 0 
+        ? textSections.map((section: any) => {
+            if (section.id === 'supplementaryInfo') {
+              return `<div class="mb-4"><div class="text-xs">${section.value}</div></div>`;
+            } else if (section.id === 'servingScoopInfo') {
+              return `<div><div class="text-xs font-bold">${section.value}</div></div>`;
+            } else {
+              return `<div class="mb-4"><h3 class="font-bold mb-2">${section.displayLabel}:</h3><div>${section.value}</div></div>`;
+            }
+          }).join('')
+        : `
+          <div class="mb-4">
+            <h3 class="font-bold mb-2">Directions:</h3>
+            <div>${directions}</div>
+          </div>
+          
+          <div class="mb-4">
+            <h3 class="font-bold mb-2">Ingredients:</h3>
+            <div>${ingredients}</div>
+          </div>
+          
+          <div class="mb-4">
+            <h3 class="font-bold mb-2">Allergen Advice:</h3>
+            <div>${allergenAdvice}</div>
+          </div>
+          
+          <div class="mb-4">
+            <h3 class="font-bold mb-2">Storage:</h3>
+            <div>${storage}</div>
+          </div>
+          
+          <div class="mb-4">
+            <div class="text-xs">${supplementaryInfo}</div>
+          </div>
+          
+          <div>
+            <div class="text-xs font-bold">${servingScoopInfo}</div>
+          </div>
+        `
+      }
     </div>
   `;
 }
@@ -360,6 +397,7 @@ function generateUSProteinHTML(productData: any): string {
     storage,
     supplementaryInfo,
     servingScoopInfo,
+    textSections,
     nutritionalData,
     nutritionalItems,
     aminoAcidData,
@@ -716,6 +754,7 @@ function generateAUProteinHTML(productData: any): string {
     storage,
     supplementaryInfo,
     servingScoopInfo,
+    textSections,
     nutritionalData,
     nutritionalItems,
     aminoAcidData,
@@ -739,34 +778,44 @@ function generateAUProteinHTML(productData: any): string {
     <div class="max-w-2xl mx-auto bg-white text-black p-8 font-sans text-sm leading-tight">
       <div class="grid gap-8 w-full grid-cols-1 lg:grid-cols-2">
         <div class="space-y-4 w-full">
-          <div>
-            <h3 class="font-bold text-base mb-2">DIRECTIONS:</h3>
-            <div>${directions}</div>
-          </div>
-          <div>
-            <h3 class="font-bold text-base mb-2">SERVING SIZE:</h3>
-            <p>${servingSize}</p>
-          </div>
-          <div>
-            <h3 class="font-bold text-base mb-2">INGREDIENTS:</h3>
-            <div>${ingredients}</div>
-          </div>
-          <div>
-            <h3 class="font-bold text-base mb-2">ALLERGEN ADVICE:</h3>
-            <div>${allergenAdvice}</div>
-          </div>
-          <div>
-            <h3 class="font-bold text-base mb-2">STORAGE:</h3>
-            <div>${storage}</div>
-          </div>
-          <div>
-            <h3 class="font-bold text-base mb-2">FORMULATED SUPPLEMENTARY SPORTS FOOD.</h3>
-            <div>${supplementaryInfo}</div>
-          </div>
-          <div>
-            <h3 class="font-bold text-base mb-2">SERVING SCOOP INCLUDED,</h3>
-            <div>${servingScoopInfo}</div>
-          </div>
+          ${textSections && textSections.length > 0 
+            ? textSections.map((section: any) => `
+              <div>
+                <h3 class="font-bold text-base mb-2">${section.displayLabel}:</h3>
+                <div>${section.value}</div>
+              </div>
+            `).join('')
+            : `
+              <div>
+                <h3 class="font-bold text-base mb-2">DIRECTIONS:</h3>
+                <div>${directions}</div>
+              </div>
+              <div>
+                <h3 class="font-bold text-base mb-2">SERVING SIZE:</h3>
+                <p>${servingSize}</p>
+              </div>
+              <div>
+                <h3 class="font-bold text-base mb-2">INGREDIENTS:</h3>
+                <div>${ingredients}</div>
+              </div>
+              <div>
+                <h3 class="font-bold text-base mb-2">ALLERGEN ADVICE:</h3>
+                <div>${allergenAdvice}</div>
+              </div>
+              <div>
+                <h3 class="font-bold text-base mb-2">STORAGE:</h3>
+                <div>${storage}</div>
+              </div>
+              <div>
+                <h3 class="font-bold text-base mb-2">FORMULATED SUPPLEMENTARY SPORTS FOOD.</h3>
+                <div>${supplementaryInfo}</div>
+              </div>
+              <div>
+                <h3 class="font-bold text-base mb-2">SERVING SCOOP INCLUDED,</h3>
+                <div>${servingScoopInfo}</div>
+              </div>
+            `
+          }
         </div>
         <div class="w-full">
           <div class="w-full">

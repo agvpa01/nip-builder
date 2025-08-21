@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,24 @@ import { Textarea } from "@/components/ui/textarea";
 import { RichTextarea } from "@/components/ui/rich-textarea";
 import { Label } from "@/components/ui/label";
 import { NipPreview } from "@/components/nip-preview";
-import { Download, Eye, Plus, Trash2, Save } from "lucide-react";
+import { Download, Eye, Plus, Trash2, Save, GripVertical } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface Product {
   title: string;
@@ -51,12 +68,16 @@ interface AminoAcidData {
   };
 }
 
+interface CompositionalItem {
+  id: string;
+  name: string;
+  serve: string;
+  per100g: string;
+  borderThickness: "light" | "medium" | "large" | "xl" | "2xl";
+}
+
 interface CompositionalData {
-  [key: string]: {
-    serve: string;
-    per100g: string;
-    borderThickness: "light" | "medium" | "large" | "xl" | "2xl";
-  };
+  [key: string]: CompositionalItem;
 }
 
 interface NutritionalItem {
@@ -70,6 +91,60 @@ interface NutritionalItem {
 
 type Region = "AU" | "US";
 type Template = "protein" | "supplements" | "complex";
+
+interface TextSection {
+  id: string;
+  label: string;
+  value: string;
+  rows: number;
+  placeholder: string;
+  setter: (value: string) => void;
+}
+
+interface SortableTextSectionProps {
+  section: TextSection;
+}
+
+function SortableTextSection({ section }: SortableTextSectionProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: section.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className="relative">
+      <div className="flex items-start gap-2">
+        <button
+          className="mt-6 p-1 hover:bg-gray-100 rounded cursor-grab active:cursor-grabbing"
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical className="w-4 h-4 text-gray-400" />
+        </button>
+        <div className="flex-1">
+          <Label htmlFor={section.id}>{section.label}</Label>
+          <RichTextarea
+            id={section.id}
+            value={section.value}
+            onChange={section.setter}
+            rows={section.rows}
+            placeholder={section.placeholder}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function NipBuilder({ product, template }: NipBuilderProps) {
   const [showPreview, setShowPreview] = useState(false);
@@ -85,7 +160,11 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
       : "Add 1 heaped scoop (30g) to 200mL of water or low fat milk. Stir or shake for 20 seconds, or until completely dispersed."
   );
   const [servingSize, setServingSize] = useState(
-    template === "complex" ? "6.2 grams" : template === "supplements" ? "2 capsules" : "30 grams"
+    template === "complex"
+      ? "6.2 grams"
+      : template === "supplements"
+      ? "2 capsules"
+      : "30 grams"
   );
   const [ingredients, setIngredients] = useState(
     template === "complex"
@@ -113,6 +192,131 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
   const [consumptionWarning, setConsumptionWarning] = useState(
     "CONSUME WITHIN 60 DAYS OF OPENING"
   );
+
+  // Text sections for drag and drop
+  const [textSections, setTextSections] = useState<TextSection[]>([
+    {
+      id: "directions",
+      label: "Directions",
+      value: directions,
+      rows: 3,
+      placeholder: "Enter directions for use...",
+      setter: setDirections,
+    },
+    {
+      id: "servingSize",
+      label: "Serving Size",
+      value: servingSize,
+      rows: 1,
+      placeholder: "Enter serving size...",
+      setter: setServingSize,
+    },
+    {
+      id: "allergenAdvice",
+      label: "Allergen Advice",
+      value: allergenAdvice,
+      rows: 2,
+      placeholder: "Enter allergen information...",
+      setter: setAllergenAdvice,
+    },
+    {
+      id: "storage",
+      label: "Storage",
+      value: storage,
+      rows: 2,
+      placeholder: "Enter storage instructions...",
+      setter: setStorage,
+    },
+    {
+      id: "supplementaryInfo",
+      label: "Supplementary Info",
+      value: supplementaryInfo,
+      rows: 4,
+      placeholder: "Enter supplementary information...",
+      setter: setSupplementaryInfo,
+    },
+    {
+      id: "servingScoopInfo",
+      label: "Serving Scoop Info",
+      value: servingScoopInfo,
+      rows: 2,
+      placeholder: "Enter serving scoop information...",
+      setter: setServingScoopInfo,
+    },
+    {
+      id: "ingredients",
+      label: "Ingredients",
+      value: ingredients,
+      rows: 3,
+      placeholder: "Enter ingredients list...",
+      setter: setIngredients,
+    },
+  ]);
+
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // Handle drag end
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setTextSections((sections) => {
+        const oldIndex = sections.findIndex(
+          (section) => section.id === active.id
+        );
+        const newIndex = sections.findIndex(
+          (section) => section.id === over.id
+        );
+
+        return arrayMove(sections, oldIndex, newIndex);
+      });
+    }
+  };
+
+  // Update text sections when individual state changes
+  const updateTextSections = () => {
+    setTextSections((prevSections) =>
+      prevSections.map((section) => {
+        switch (section.id) {
+          case "directions":
+            return { ...section, value: directions };
+          case "servingSize":
+            return { ...section, value: servingSize };
+          case "allergenAdvice":
+            return { ...section, value: allergenAdvice };
+          case "storage":
+            return { ...section, value: storage };
+          case "supplementaryInfo":
+            return { ...section, value: supplementaryInfo };
+          case "servingScoopInfo":
+            return { ...section, value: servingScoopInfo };
+          case "ingredients":
+            return { ...section, value: ingredients };
+          default:
+            return section;
+        }
+      })
+    );
+  };
+
+  // Update text sections when state changes
+  useEffect(() => {
+    updateTextSections();
+  }, [
+    directions,
+    servingSize,
+    allergenAdvice,
+    storage,
+    supplementaryInfo,
+    servingScoopInfo,
+    ingredients,
+  ]);
 
   const complexNutritionalItems: NutritionalItem[] = [
     {
@@ -437,28 +641,44 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
 
   const [compositionalData, setCompositionalData] = useState<CompositionalData>(
     {
-      "AAKG (g)": { serve: "1.7", per100g: "19.1", borderThickness: "light" },
-      "Beta Alanine (mg)": {
+      comp_1: {
+        id: "comp_1",
+        name: "AAKG (g)",
+        serve: "1.7",
+        per100g: "19.1",
+        borderThickness: "light",
+      },
+      comp_2: {
+        id: "comp_2",
+        name: "Beta Alanine (mg)",
         serve: "1,560",
         per100g: "25,100",
         borderThickness: "light",
       },
-      "Arginine (mg)": {
+      comp_3: {
+        id: "comp_3",
+        name: "Arginine (mg)",
         serve: "232",
         per100g: "3,740",
         borderThickness: "light",
       },
-      "Citrulline Malate (g)": {
+      comp_4: {
+        id: "comp_4",
+        name: "Citrulline Malate (g)",
         serve: "0.4",
         per100g: "7.3",
         borderThickness: "light",
       },
-      "Creatine Monohydrate (g)": {
+      comp_5: {
+        id: "comp_5",
+        name: "Creatine Monohydrate (g)",
         serve: "1.9",
         per100g: "30.3",
         borderThickness: "light",
       },
-      "L-Tyrosine (mg)": {
+      comp_6: {
+        id: "comp_6",
+        name: "L-Tyrosine (mg)",
         serve: "97",
         per100g: "1,560",
         borderThickness: "light",
@@ -509,40 +729,47 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
   };
 
   const updateCompositionalData = (
-    field: string,
-    type: "serve" | "per100g",
+    id: string,
+    type: "serve" | "per100g" | "name",
     value: string
   ) => {
     setCompositionalData((prev) => ({
       ...prev,
-      [field]: { ...prev[field], [type]: value },
+      [id]: { ...prev[id], [type]: value },
     }));
   };
 
   const updateCompositionalBorderThickness = (
-    field: string,
+    id: string,
     thickness: "light" | "medium" | "large" | "xl" | "2xl"
   ) => {
     setCompositionalData((prev) => ({
       ...prev,
-      [field]: { ...prev[field], borderThickness: thickness },
+      [id]: { ...prev[id], borderThickness: thickness },
     }));
   };
 
   const addCompositionalItem = () => {
-    const newKey = `New Ingredient ${
+    const newId = `comp_${Date.now()}`;
+    const newName = `New Ingredient ${
       Object.keys(compositionalData).length + 1
     }`;
     setCompositionalData((prev) => ({
       ...prev,
-      [newKey]: { serve: "0", per100g: "0", borderThickness: "light" },
+      [newId]: {
+        id: newId,
+        name: newName,
+        serve: "0",
+        per100g: "0",
+        borderThickness: "light",
+      },
     }));
   };
 
-  const removeCompositionalItem = (key: string) => {
+  const removeCompositionalItem = (id: string) => {
     setCompositionalData((prev) => {
       const newData = { ...prev };
-      delete newData[key];
+      delete newData[id];
       return newData;
     });
   };
@@ -695,6 +922,22 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
             storage,
             supplementaryInfo,
             servingScoopInfo,
+            textSections: textSections
+              .filter((section) => {
+                // Filter sections based on template
+                if (template === "protein") {
+                  return true; // Show all sections for protein
+                } else if (template === "complex") {
+                  return section.id !== "servingScoopInfo"; // Hide serving scoop info for complex
+                }
+                return section.id === "ingredients"; // Only show ingredients for other templates
+              })
+              .map((section) => ({
+                id: section.id,
+                label: section.label,
+                value: section.value,
+                displayLabel: section.label.toUpperCase(),
+              })),
             nutritionalData,
             aminoAcidData,
             compositionalData,
@@ -748,6 +991,26 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
           storage={storage}
           supplementaryInfo={supplementaryInfo}
           servingScoopInfo={servingScoopInfo}
+          textSections={textSections
+            .filter((section) => {
+              // Filter sections based on template
+              if (template === "protein") {
+                return true; // Show all sections for protein
+              } else if (template === "complex") {
+                // Show all sections except serving scoop info for complex
+                return section.id !== "servingScoopInfo";
+              } else if (template === "supplements") {
+                // Show only ingredients for supplements
+                return section.id === "ingredients";
+              }
+              return true; // Show all sections for other templates
+            })
+            .map((section) => ({
+              id: section.id,
+              label: section.label,
+              value: section.value,
+              displayLabel: section.label.toUpperCase(),
+            }))}
           nutritionalData={nutritionalData}
           aminoAcidData={aminoAcidData}
           compositionalData={compositionalData}
@@ -795,109 +1058,75 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
         </div>
       </div>
 
-      <div className={`grid grid-cols-1 gap-6 ${template !== "supplements" ? "lg:grid-cols-2" : "lg:grid-cols-1"}`}>
+      <div
+        className={`grid grid-cols-1 gap-6 ${
+          template !== "supplements" ? "lg:grid-cols-2" : "lg:grid-cols-1"
+        }`}
+      >
         {/* Text Sections - Hidden for supplements template */}
         {template !== "supplements" && (
           <Card>
             <CardHeader>
-              <CardTitle>Text Sections</CardTitle>
+              <CardTitle>Text Sections (Drag to Reorder)</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {template === "protein" && (
-                <>
-                  <div>
-                    <Label htmlFor="directions">Directions</Label>
-                    <RichTextarea
-                      id="directions"
-                      value={directions}
-                      onChange={setDirections}
-                      rows={3}
-                      placeholder="Enter directions with formatting..."
-                    />
+            <CardContent>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={textSections
+                    .filter((section) => {
+                      // Filter sections based on template
+                      if (template === "protein") {
+                        return true; // Show all sections for protein
+                      } else if (template === "complex") {
+                        return section.id !== "servingScoopInfo"; // Hide serving scoop info for complex
+                      }
+                      return section.id === "ingredients"; // Only show ingredients for other templates
+                    })
+                    .map((section) => section.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="space-y-4">
+                    {textSections
+                      .filter((section) => {
+                        // Filter sections based on template
+                        if (template === "protein") {
+                          return true; // Show all sections for protein
+                        } else if (template === "complex") {
+                          return section.id !== "servingScoopInfo"; // Hide serving scoop info for complex
+                        }
+                        return section.id === "ingredients"; // Only show ingredients for other templates
+                      })
+                      .map((section) => (
+                        <SortableTextSection
+                          key={section.id}
+                          section={section}
+                        />
+                      ))}
+
+                    {/* Consumption Warning for complex template */}
+                    {template === "complex" && (
+                      <div>
+                        <Label htmlFor="consumption-warning">
+                          Consumption Warning
+                        </Label>
+                        <RichTextarea
+                          id="consumption-warning"
+                          value={consumptionWarning}
+                          onChange={setConsumptionWarning}
+                          rows={1}
+                          placeholder="Enter consumption warning with formatting..."
+                        />
+                      </div>
+                    )}
                   </div>
-
-                  <div>
-                    <Label htmlFor="serving-size">Serving Size</Label>
-                    <RichTextarea
-                      id="serving-size"
-                      value={servingSize}
-                      onChange={setServingSize}
-                      rows={1}
-                      placeholder="Enter serving size with formatting..."
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="allergen">Allergen Advice</Label>
-                    <RichTextarea
-                      id="allergen"
-                      value={allergenAdvice}
-                      onChange={setAllergenAdvice}
-                      rows={2}
-                      placeholder="Enter allergen advice with formatting..."
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="storage">Storage</Label>
-                    <RichTextarea
-                      id="storage"
-                      value={storage}
-                      onChange={setStorage}
-                      rows={3}
-                      placeholder="Enter storage instructions with formatting..."
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="supplementary">Supplementary Info</Label>
-                    <RichTextarea
-                      id="supplementary"
-                      value={supplementaryInfo}
-                      onChange={setSupplementaryInfo}
-                      rows={4}
-                      placeholder="Enter supplementary information with formatting..."
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="serving-scoop">Serving Scoop Info</Label>
-                    <RichTextarea
-                      id="serving-scoop"
-                      value={servingScoopInfo}
-                      onChange={setServingScoopInfo}
-                      rows={3}
-                      placeholder="Enter serving scoop information with formatting..."
-                    />
-                  </div>
-                </>
-              )}
-
-              <div>
-                <Label htmlFor="ingredients">Ingredients</Label>
-                <RichTextarea
-                  id="ingredients"
-                  value={ingredients}
-                  onChange={setIngredients}
-                  rows={3}
-                  placeholder="Enter ingredients with formatting..."
-                />
-              </div>
-
-            {template === "complex" && (
-              <div>
-                <Label htmlFor="consumption-warning">Consumption Warning</Label>
-                <RichTextarea
-                  id="consumption-warning"
-                  value={consumptionWarning}
-                  onChange={setConsumptionWarning}
-                  rows={1}
-                  placeholder="Enter consumption warning with formatting..."
-                />
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                </SortableContext>
+              </DndContext>
+            </CardContent>
+          </Card>
         )}
 
         {/* Nutritional Information */}
@@ -1029,38 +1258,41 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {Object.entries(compositionalData).map(([key, data]) => (
-                <div key={key} className="grid grid-cols-6 gap-2 items-center">
-                  <Input
+              {Object.entries(compositionalData).map(([id, data]) => (
+                <div
+                  key={data.id}
+                  className="grid grid-cols-6 gap-2 items-center"
+                >
+                  <RichTextarea
                     placeholder="Ingredient name"
-                    value={key}
-                    onChange={(e) => {
-                      const newData = { ...compositionalData };
-                      delete newData[key];
-                      newData[e.target.value] = data;
-                      setCompositionalData(newData);
-                    }}
+                    value={data.name}
+                    onChange={(value) =>
+                      updateCompositionalData(id, "name", value)
+                    }
                     className="text-sm"
+                    rows={1}
                   />
-                  <Input
+                  <RichTextarea
                     placeholder="Per Serve"
                     value={data.serve}
-                    onChange={(e) =>
-                      updateCompositionalData(key, "serve", e.target.value)
+                    onChange={(value) =>
+                      updateCompositionalData(id, "serve", value)
                     }
+                    rows={1}
                   />
-                  <Input
+                  <RichTextarea
                     placeholder="Per 100g"
                     value={data.per100g}
-                    onChange={(e) =>
-                      updateCompositionalData(key, "per100g", e.target.value)
+                    onChange={(value) =>
+                      updateCompositionalData(id, "per100g", value)
                     }
+                    rows={1}
                   />
                   <select
                     value={data.borderThickness}
                     onChange={(e) =>
                       updateCompositionalBorderThickness(
-                        key,
+                        id,
                         e.target.value as any
                       )
                     }
@@ -1073,7 +1305,7 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
                     <option value="2xl">2XL</option>
                   </select>
                   <Button
-                    onClick={() => removeCompositionalItem(key)}
+                    onClick={() => removeCompositionalItem(id)}
                     variant="destructive"
                     size="sm"
                     className="px-2"
