@@ -8,7 +8,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { RichTextarea } from "@/components/ui/rich-textarea";
 import { Label } from "@/components/ui/label";
 import { NipPreview } from "@/components/nip-preview";
-import { Download, Eye, Plus, Trash2, Save, GripVertical } from "lucide-react";
+import {
+  Download,
+  Eye,
+  EyeOff,
+  Plus,
+  Trash2,
+  Save,
+  GripVertical,
+} from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -26,6 +34,7 @@ import {
 } from "@dnd-kit/sortable";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { useState as useLocalState } from "react";
 
 interface Product {
   title: string;
@@ -99,13 +108,87 @@ interface TextSection {
   rows: number;
   placeholder: string;
   setter: (value: string) => void;
+  isCustom?: boolean;
+  isRemovable?: boolean;
+  hideLabel?: boolean;
 }
 
 interface SortableTextSectionProps {
   section: TextSection;
+  onRemove?: (id: string) => void;
+  onToggleLabel?: (id: string) => void;
 }
 
-function SortableTextSection({ section }: SortableTextSectionProps) {
+interface AddCustomSectionButtonProps {
+  onAdd: (label: string) => void;
+}
+
+function AddCustomSectionButton({ onAdd }: AddCustomSectionButtonProps) {
+  const [isAdding, setIsAdding] = useLocalState(false);
+  const [newLabel, setNewLabel] = useLocalState("");
+
+  const handleAdd = () => {
+    if (newLabel.trim()) {
+      onAdd(newLabel.trim());
+      setNewLabel("");
+      setIsAdding(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setNewLabel("");
+    setIsAdding(false);
+  };
+
+  if (isAdding) {
+    return (
+      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+        <div className="space-y-3">
+          <Label htmlFor="new-section-label">Section Label</Label>
+          <Input
+            id="new-section-label"
+            value={newLabel}
+            onChange={(e) => setNewLabel(e.target.value)}
+            placeholder="Enter section label (e.g., 'Warnings', 'Benefits')..."
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleAdd();
+              } else if (e.key === "Escape") {
+                handleCancel();
+              }
+            }}
+            autoFocus
+          />
+          <div className="flex gap-2">
+            <Button onClick={handleAdd} size="sm" disabled={!newLabel.trim()}>
+              Add Section
+            </Button>
+            <Button onClick={handleCancel} variant="outline" size="sm">
+              Cancel
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <Button
+      onClick={() => setIsAdding(true)}
+      variant="outline"
+      className="w-full border-2 border-dashed border-gray-300 hover:border-gray-400 hover:bg-gray-50"
+    >
+      <Plus className="w-4 h-4 mr-2" />
+      Add Custom Section
+    </Button>
+  );
+}
+
+function SortableTextSection({
+  section,
+  onRemove,
+  onToggleLabel,
+}: SortableTextSectionProps) {
   const {
     attributes,
     listeners,
@@ -132,7 +215,66 @@ function SortableTextSection({ section }: SortableTextSectionProps) {
           <GripVertical className="w-4 h-4 text-gray-400" />
         </button>
         <div className="flex-1">
-          <Label htmlFor={section.id}>{section.label}</Label>
+          {!section.hideLabel && (
+            <div className="flex items-center justify-between mb-1">
+              <Label htmlFor={section.id}>{section.label}</Label>
+              <div className="flex items-center gap-1">
+                {onToggleLabel && (
+                  <Button
+                    onClick={() => onToggleLabel(section.id)}
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                    title="Hide label"
+                  >
+                    <EyeOff className="w-3 h-3" />
+                  </Button>
+                )}
+                {section.isRemovable && onRemove && (
+                  <Button
+                    onClick={() => onRemove(section.id)}
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                    title="Remove section"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+          {section.hideLabel && (
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-500 italic">
+                  {section.label} (hidden)
+                </span>
+                {onToggleLabel && (
+                  <Button
+                    onClick={() => onToggleLabel(section.id)}
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                    title="Show label"
+                  >
+                    <Eye className="w-3 h-3" />
+                  </Button>
+                )}
+              </div>
+              {section.isRemovable && onRemove && (
+                <Button
+                  onClick={() => onRemove(section.id)}
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                  title="Remove section"
+                >
+                  <Trash2 className="w-3 h-3" />
+                </Button>
+              )}
+            </div>
+          )}
           <RichTextarea
             id={section.id}
             value={section.value}
@@ -193,6 +335,16 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
     "CONSUME WITHIN 60 DAYS OF OPENING"
   );
 
+  // Custom sections state
+  const [customSections, setCustomSections] = useState<{
+    [key: string]: string;
+  }>({});
+
+  // Custom section setter factory
+  const createCustomSetter = (id: string) => (value: string) => {
+    setCustomSections((prev) => ({ ...prev, [id]: value }));
+  };
+
   // Text sections for drag and drop
   const [textSections, setTextSections] = useState<TextSection[]>([
     {
@@ -202,6 +354,9 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
       rows: 3,
       placeholder: "Enter directions for use...",
       setter: setDirections,
+      isCustom: false,
+      isRemovable: true,
+      hideLabel: false,
     },
     {
       id: "servingSize",
@@ -210,6 +365,9 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
       rows: 1,
       placeholder: "Enter serving size...",
       setter: setServingSize,
+      isCustom: false,
+      isRemovable: true,
+      hideLabel: false,
     },
     {
       id: "allergenAdvice",
@@ -218,6 +376,9 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
       rows: 2,
       placeholder: "Enter allergen information...",
       setter: setAllergenAdvice,
+      isCustom: false,
+      isRemovable: true,
+      hideLabel: false,
     },
     {
       id: "storage",
@@ -226,6 +387,9 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
       rows: 2,
       placeholder: "Enter storage instructions...",
       setter: setStorage,
+      isCustom: false,
+      isRemovable: true,
+      hideLabel: false,
     },
     {
       id: "supplementaryInfo",
@@ -234,6 +398,9 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
       rows: 4,
       placeholder: "Enter supplementary information...",
       setter: setSupplementaryInfo,
+      isCustom: false,
+      isRemovable: true,
+      hideLabel: false,
     },
     {
       id: "servingScoopInfo",
@@ -242,6 +409,9 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
       rows: 2,
       placeholder: "Enter serving scoop information...",
       setter: setServingScoopInfo,
+      isCustom: false,
+      isRemovable: true,
+      hideLabel: false,
     },
     {
       id: "ingredients",
@@ -250,6 +420,9 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
       rows: 3,
       placeholder: "Enter ingredients list...",
       setter: setIngredients,
+      isCustom: false,
+      isRemovable: true,
+      hideLabel: false,
     },
   ]);
 
@@ -279,6 +452,56 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
     }
   };
 
+  // Add custom section
+  const addCustomSection = (label: string) => {
+    const id = `custom_${Date.now()}_${Math.random()
+      .toString(36)
+      .substr(2, 9)}`;
+    const newSection: TextSection = {
+      id,
+      label,
+      value: "",
+      rows: 2,
+      placeholder: `Enter ${label.toLowerCase()}...`,
+      setter: createCustomSetter(id),
+      isCustom: true,
+      isRemovable: true,
+      hideLabel: false,
+    };
+
+    setTextSections((prev) => [...prev, newSection]);
+    setCustomSections((prev) => ({ ...prev, [id]: "" }));
+  };
+
+  // Remove section
+  const removeSection = (id: string) => {
+    setTextSections((prev) => prev.filter((section) => section.id !== id));
+    if (customSections[id] !== undefined) {
+      setCustomSections((prev) => {
+        const newSections = { ...prev };
+        delete newSections[id];
+        return newSections;
+      });
+    } else {
+      // For default sections, clear their values when removed
+      const section = textSections.find((s) => s.id === id);
+      if (section && section.setter) {
+        section.setter("");
+      }
+    }
+  };
+
+  // Toggle label visibility
+  const toggleLabel = (id: string) => {
+    setTextSections((prev) =>
+      prev.map((section) =>
+        section.id === id
+          ? { ...section, hideLabel: !section.hideLabel }
+          : section
+      )
+    );
+  };
+
   // Update text sections when individual state changes
   const updateTextSections = () => {
     setTextSections((prevSections) =>
@@ -299,6 +522,10 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
           case "ingredients":
             return { ...section, value: ingredients };
           default:
+            // Handle custom sections
+            if (section.isCustom && customSections[section.id] !== undefined) {
+              return { ...section, value: customSections[section.id] };
+            }
             return section;
         }
       })
@@ -316,6 +543,7 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
     supplementaryInfo,
     servingScoopInfo,
     ingredients,
+    customSections,
   ]);
 
   const complexNutritionalItems: NutritionalItem[] = [
@@ -1010,6 +1238,7 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
               label: section.label,
               value: section.value,
               displayLabel: section.label.toUpperCase(),
+              hideLabel: section.hideLabel,
             }))}
           nutritionalData={nutritionalData}
           aminoAcidData={aminoAcidData}
@@ -1104,8 +1333,13 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
                         <SortableTextSection
                           key={section.id}
                           section={section}
+                          onRemove={removeSection}
+                          onToggleLabel={toggleLabel}
                         />
                       ))}
+
+                    {/* Add Custom Section Button */}
+                    <AddCustomSectionButton onAdd={addCustomSection} />
 
                     {/* Consumption Warning for complex template */}
                     {template === "complex" && (
@@ -1144,11 +1378,12 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>Serving Size</Label>
-                <Input
+                <RichTextarea
                   value={nutritionalData.servingSize}
-                  onChange={(e) =>
-                    updateNutritionalData("servingSize", e.target.value)
+                  onChange={(value) =>
+                    updateNutritionalData("servingSize", value)
                   }
+                  rows={1}
                 />
               </div>
               <div>
@@ -1157,11 +1392,12 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
                     ? "Servings per Bottle"
                     : "Servings per Pack"}
                 </Label>
-                <Input
+                <RichTextarea
                   value={nutritionalData.servingsPerPack}
-                  onChange={(e) =>
-                    updateNutritionalData("servingsPerPack", e.target.value)
+                  onChange={(value) =>
+                    updateNutritionalData("servingsPerPack", value)
                   }
+                  rows={1}
                 />
               </div>
             </div>
@@ -1331,41 +1567,34 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               {Object.entries(aminoAcidData).map(([key, data]) => (
-                <div key={key} className="space-y-2">
-                  <div className="flex gap-2 items-center">
-                    <Input
-                      placeholder="Amino Acid Name"
-                      value={key}
-                      onChange={(e) => {
-                        const newData = { ...aminoAcidData };
-                        delete newData[key];
-                        newData[e.target.value] = data;
-                        setAminoAcidData(newData);
-                      }}
-                      className="flex-1"
-                    />
-                    <Input
-                      placeholder="Value"
-                      value={data.value}
-                      onChange={(e) => updateAminoAcidData(key, e.target.value)}
-                      className="w-24"
-                    />
-                    <Button
-                      onClick={() => removeAminoAcid(key)}
-                      variant="destructive"
-                      size="sm"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
+                <div key={key} className="flex gap-2 items-center">
+                  <RichTextarea
+                    placeholder="Amino Acid Name"
+                    value={key}
+                    onChange={(value) => {
+                      const newData = { ...aminoAcidData };
+                      delete newData[key];
+                      newData[value] = data;
+                      setAminoAcidData(newData);
+                    }}
+                    className="flex-1"
+                    rows={1}
+                  />
+                  <RichTextarea
+                    placeholder="Value"
+                    value={data.value}
+                    onChange={(value) => updateAminoAcidData(key, value)}
+                    className="w-24"
+                    rows={1}
+                  />
                   <select
                     value={data.borderThickness}
                     onChange={(e) =>
                       updateAminoAcidBorderThickness(key, e.target.value as any)
                     }
-                    className="w-full px-2 py-1 border rounded text-sm"
+                    className="w-32 px-2 py-1 border rounded text-sm"
                   >
                     <option value="light">Light Border</option>
                     <option value="medium">Medium Border</option>
@@ -1373,6 +1602,13 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
                     <option value="xl">XL Border</option>
                     <option value="2xl">2XL Border</option>
                   </select>
+                  <Button
+                    onClick={() => removeAminoAcid(key)}
+                    variant="destructive"
+                    size="sm"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
                 </div>
               ))}
             </div>

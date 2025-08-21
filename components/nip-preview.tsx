@@ -61,6 +61,7 @@ interface TextSectionData {
   label: string;
   value: string;
   displayLabel: string;
+  hideLabel?: boolean;
 }
 
 interface NipPreviewProps {
@@ -449,7 +450,9 @@ export function NipPreview({
             {textSections.length > 0 ? (
               textSections.map((section) => (
                 <div key={section.id}>
-                  <h3 className="font-bold text-base mb-2">{section.displayLabel}:</h3>
+                  {!section.hideLabel && (
+                    <h3 className="font-bold text-base mb-2">{section.displayLabel}:</h3>
+                  )}
                   <div dangerouslySetInnerHTML={{ __html: section.value }} />
                 </div>
               ))
@@ -592,10 +595,12 @@ export function NipPreview({
             <div className="space-y-4 mt-6 w-full">
               {textSections.length > 0 ? (
                 textSections
-                  .filter(section => section.id === "ingredients")
+                  .filter(section => section.id !== "servingScoopInfo")
                   .map((section) => (
                     <div key={section.id}>
-                      <h3 className="font-bold text-base mb-2">{section.displayLabel}:</h3>
+                      {!section.hideLabel && (
+                        <h3 className="font-bold text-base mb-2">{section.displayLabel}:</h3>
+                      )}
                       <div
                         className="text-sm"
                         dangerouslySetInnerHTML={{ __html: section.value }}

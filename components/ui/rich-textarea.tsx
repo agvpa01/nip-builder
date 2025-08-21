@@ -25,48 +25,64 @@ export function RichTextarea({
   const editorRef = useRef<HTMLDivElement>(null);
   const [isFocused, setIsFocused] = useState(false);
   const savedSelectionRef = useRef<Range | null>(null);
+  const isUserTypingRef = useRef(false);
+  const lastValueRef = useRef(value);
 
   const handleInput = useCallback(() => {
     if (editorRef.current) {
+      isUserTypingRef.current = true;
       const html = editorRef.current.innerHTML;
+      lastValueRef.current = html;
       onChange(html);
+      // Reset the flag after a minimal delay to allow for external updates
+      setTimeout(() => {
+        isUserTypingRef.current = false;
+      }, 50);
     }
   }, [onChange]);
 
-  // Sync value prop with editor content only when necessary
+  // Initialize editor content on mount
   useEffect(() => {
-    if (editorRef.current && editorRef.current.innerHTML !== value) {
-      // Save current selection
-      const selection = window.getSelection();
-      let savedRange: Range | null = null;
-      if (selection && selection.rangeCount > 0) {
-        savedRange = selection.getRangeAt(0).cloneRange();
-      }
-
-      // Update content
+    if (editorRef.current && editorRef.current.innerHTML === '' && value) {
       editorRef.current.innerHTML = value;
+      lastValueRef.current = value;
+    }
+  }, []); // Run only on mount
 
-      // Restore selection if it was saved and editor is focused
-      if (savedRange && document.activeElement === editorRef.current) {
-        try {
-          selection?.removeAllRanges();
-          selection?.addRange(savedRange);
-        } catch (e) {
-          // If restoring selection fails, place cursor at end
-          const range = document.createRange();
-          const lastChild = editorRef.current.lastChild;
-          if (lastChild) {
-            if (lastChild.nodeType === Node.TEXT_NODE) {
+  // Sync value prop with editor content only when it's an external change
+  useEffect(() => {
+    if (editorRef.current && value !== lastValueRef.current) {
+      // Skip update if user is currently typing
+      if (isUserTypingRef.current) {
+        return;
+      }
+      
+      // Update content only if it's truly different
+      if (editorRef.current.innerHTML !== value) {
+        const wasEditorFocused = document.activeElement === editorRef.current;
+        
+        editorRef.current.innerHTML = value;
+        lastValueRef.current = value;
+        
+        // Only restore focus and cursor if the editor was previously focused
+        if (wasEditorFocused) {
+          editorRef.current.focus();
+          // Place cursor at end
+          const selection = window.getSelection();
+          if (selection) {
+            const range = document.createRange();
+            const lastChild = editorRef.current.lastChild;
+            if (lastChild && lastChild.nodeType === Node.TEXT_NODE) {
               range.setStart(lastChild, lastChild.textContent?.length || 0);
-            } else {
+            } else if (lastChild) {
               range.setStartAfter(lastChild);
+            } else {
+              range.setStart(editorRef.current, 0);
             }
-          } else {
-            range.setStart(editorRef.current, 0);
+            range.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(range);
           }
-          range.collapse(true);
-          selection?.removeAllRanges();
-          selection?.addRange(range);
         }
       }
     }
