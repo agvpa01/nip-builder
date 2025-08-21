@@ -451,7 +451,9 @@ export function NipPreview({
               textSections.map((section) => (
                 <div key={section.id}>
                   {!section.hideLabel && (
-                    <h3 className="font-bold text-base mb-2">{section.displayLabel}:</h3>
+                    <h3 className="font-bold text-base mb-2">
+                      {section.displayLabel}:
+                    </h3>
                   )}
                   <div dangerouslySetInnerHTML={{ __html: section.value }} />
                 </div>
@@ -483,7 +485,9 @@ export function NipPreview({
                   <h3 className="font-bold text-base mb-2">
                     FORMULATED SUPPLEMENTARY SPORTS FOOD.
                   </h3>
-                  <div dangerouslySetInnerHTML={{ __html: supplementaryInfo }} />
+                  <div
+                    dangerouslySetInnerHTML={{ __html: supplementaryInfo }}
+                  />
                 </div>
                 <div>
                   <h3 className="font-bold text-base mb-2">
@@ -495,111 +499,124 @@ export function NipPreview({
             )}
           </div>
         )}
-        <div className="w-full ">
-          <div className="w-full ">
-            <div className="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-sm">
+        <div className="w-full">
+          <div className="border-2 border-black">
+            <div className="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-lg">
               NUTRITIONAL INFORMATION
             </div>
-            <table className="w-full border-collapse">
-              <tbody>
-                <tr style={{ borderBottom: thickBorderStyle }}>
-                  <td className="py-1 px-2">
-                    Serving Size: {nutritionalData.servingSize}
-                  </td>
-                  <td></td>
-                  <td className="py-1 px-2 text-right">
-                    {template === "supplements"
-                      ? "Servings per Bottle"
-                      : "Servings per Pack"}
-                    : {nutritionalData.servingsPerPack}
-                  </td>
-                </tr>
-                <tr style={{ borderBottom: borderStyle }}>
-                  <td className="py-1 px-2"></td>
-                  <td className="py-1 px-2 font-normal text-xs text-right w-32">
-                    Per Serve
-                  </td>
-                  <td className="py-1 px-2 text-right font-normal text-xs">
-                    Per 100g
-                  </td>
-                </tr>
-                {nutritionalItems.map((item) => (
-                  <tr
-                    key={item.id}
-                    style={{
-                      borderBottom: getBorderThickness(item.borderThickness),
-                    }}
-                  >
-                    <td
-                      className={`py-1 px-2 ${
-                        item.label.includes("Saturated") ||
-                        item.label.includes("Sugars")
-                          ? "italic pl-4"
-                          : ""
-                      }`}
-                      dangerouslySetInnerHTML={{ __html: item.label }}
-                    />
-                    <td
-                      className="py-1 px-2 text-right"
-                      dangerouslySetInnerHTML={{
-                        __html: nutritionalData[item.serveKey],
-                      }}
-                    />
-                    <td
-                      className="py-1 px-2 text-right"
-                      dangerouslySetInnerHTML={{
-                        __html: nutritionalData[item.per100gKey],
-                      }}
-                    />
+            <div className="p-2">
+              <table className="w-full border-collapse">
+                <tbody>
+                  <tr style={{ borderBottom: thickBorderStyle }}>
+                    <td className="py-1 px-2">
+                      Serving Size: {nutritionalData.servingSize}
+                    </td>
+                    <td></td>
+                    <td className="py-1 px-2 text-right">
+                      {template === "supplements"
+                        ? "Servings per Bottle"
+                        : "Servings per Pack"}
+                      : {nutritionalData.servingsPerPack}
+                    </td>
                   </tr>
-                ))}
-                {template === "complex" && (
-                  <>
-                    <tr>
+                  <tr style={{ borderBottom: borderStyle }}>
+                    <td className="py-1 px-2"></td>
+                    <td className="py-1 px-2 font-normal text-xs text-right w-32">
+                      Per Serve
+                    </td>
+                    <td className="py-1 px-2 text-right font-normal text-xs">
+                      Per 100g
+                    </td>
+                  </tr>
+                  {nutritionalItems.map((item) => (
+                    <tr
+                      key={item.id}
+                      style={{
+                        borderBottom: getBorderThickness(item.borderThickness),
+                      }}
+                    >
                       <td
-                        colSpan={3}
-                        className="bg-black text-white text-center py-2 px-4 font-bold text-base"
-                      >
-                        COMPOSITIONAL INFORMATION
-                      </td>
-                    </tr>
-                    {Object.entries(compositionalData).map(([id, data]) => (
-                      <tr
-                        key={data.id}
-                        style={{
-                          borderBottom: getBorderThickness(
-                            data.borderThickness
-                          ),
+                        className={`py-1 px-2 ${
+                          item.label.includes("Saturated") ||
+                          item.label.includes("Sugars")
+                            ? "italic pl-4"
+                            : ""
+                        }`}
+                        dangerouslySetInnerHTML={{ __html: item.label }}
+                      />
+                      <td
+                        className="py-1 px-2 text-right"
+                        dangerouslySetInnerHTML={{
+                          __html: nutritionalData[item.serveKey],
                         }}
-                      >
-                        <td
-                          className="py-1 px-2"
-                          dangerouslySetInnerHTML={{ __html: data.name }}
-                        />
-                        <td
-                          className="py-1 px-2 text-right"
-                          dangerouslySetInnerHTML={{ __html: data.serve }}
-                        />
-                        <td
-                          className="py-1 px-2 text-right"
-                          dangerouslySetInnerHTML={{ __html: data.per100g }}
-                        />
-                      </tr>
-                    ))}
-                  </>
-                )}
-              </tbody>
-            </table>
+                      />
+                      <td
+                        className="py-1 px-2 text-right"
+                        dangerouslySetInnerHTML={{
+                          __html: nutritionalData[item.per100gKey],
+                        }}
+                      />
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
+          {template === "complex" &&
+            Object.keys(compositionalData).length > 0 && (
+              <div className="border-2 border-black w-full mt-6 relative">
+                <div className="p-2 pt-12">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr>
+                        <th
+                          colSpan={3}
+                          className="bg-black text-white text-center font-bold text-xl absolute top-0 left-0 right-0 m-0 p-2"
+                        >
+                          COMPOSITIONAL INFORMATION
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Object.entries(compositionalData).map(([id, data]) => (
+                        <tr
+                          key={data.id}
+                          style={{
+                            borderBottom: getBorderThickness(
+                              data.borderThickness
+                            ),
+                          }}
+                        >
+                          <td
+                            className="py-1 px-2"
+                            dangerouslySetInnerHTML={{ __html: data.name }}
+                          />
+                          <td
+                            className="py-1 px-2 text-right"
+                            dangerouslySetInnerHTML={{ __html: data.serve }}
+                          />
+                          <td
+                            className="py-1 px-2 text-right"
+                            dangerouslySetInnerHTML={{ __html: data.per100g }}
+                          />
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           {template === "complex" && (
             <div className="space-y-4 mt-6 w-full">
               {textSections.length > 0 ? (
                 textSections
-                  .filter(section => section.id !== "servingScoopInfo")
+                  .filter((section) => section.id !== "servingScoopInfo")
                   .map((section) => (
                     <div key={section.id}>
                       {!section.hideLabel && (
-                        <h3 className="font-bold text-base mb-2">{section.displayLabel}:</h3>
+                        <h3 className="font-bold text-base mb-2">
+                          {section.displayLabel}:
+                        </h3>
                       )}
                       <div
                         className="text-sm"
@@ -627,47 +644,53 @@ export function NipPreview({
           )}
           {template === "protein" && (
             <div className="mt-6 w-full">
-              <div className="bg-black text-white text-center py-2 px-4 font-bold text-base">
-                TYPICAL AMINO ACID PROFILE
-              </div>
-              <div
-                className="text-right py-1 font-semibold"
-                style={{ borderBottom: thickBorderStyle }}
-              >
-                Per 100g of Protein
-              </div>
-              <table className="w-full border-collapse">
-                <tbody>
-                  {Object.entries(aminoAcidData).map(([key, data]) => (
-                    <tr
-                      key={key}
-                      style={{
-                        borderBottom: getBorderThickness(data.borderThickness),
-                      }}
-                    >
-                      <td
-                        className="py-1 px-2"
-                        dangerouslySetInnerHTML={{ __html: key }}
-                      />
-                      <td
-                        className="py-1 px-2 text-right"
-                        dangerouslySetInnerHTML={{ __html: data.value }}
-                      />
-                    </tr>
-                  ))}
-                  <tr
-                    style={{
-                      borderBottom: borderStyle,
-                      borderTop: thickBorderStyle,
-                    }}
+              <div className="border-2 border-black">
+                <div className="bg-black text-white text-center py-2 px-4 font-bold text-xl">
+                  TYPICAL AMINO ACID PROFILE
+                </div>
+                <div className="p-2">
+                  <div
+                    className="text-right py-1 font-semibold"
+                    style={{ borderBottom: thickBorderStyle }}
                   >
-                    <td className="py-1 px-2 font-semibold">
-                      BCAAs* = 5,832 mg per serve
-                    </td>
-                    <td></td>
-                  </tr>
-                </tbody>
-              </table>
+                    Per 100g of Protein
+                  </div>
+                  <table className="w-full border-collapse">
+                    <tbody>
+                      {Object.entries(aminoAcidData).map(([key, data]) => (
+                        <tr
+                          key={key}
+                          style={{
+                            borderBottom: getBorderThickness(
+                              data.borderThickness
+                            ),
+                          }}
+                        >
+                          <td
+                            className="py-1 px-2"
+                            dangerouslySetInnerHTML={{ __html: key }}
+                          />
+                          <td
+                            className="py-1 px-2 text-right"
+                            dangerouslySetInnerHTML={{ __html: data.value }}
+                          />
+                        </tr>
+                      ))}
+                      <tr
+                        style={{
+                          borderBottom: borderStyle,
+                          borderTop: thickBorderStyle,
+                        }}
+                      >
+                        <td className="py-1 px-2 font-semibold">
+                          BCAAs* = 5,832 mg per serve
+                        </td>
+                        <td></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           )}
         </div>

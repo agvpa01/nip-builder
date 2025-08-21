@@ -43,7 +43,7 @@ export function RichTextarea({
 
   // Initialize editor content on mount
   useEffect(() => {
-    if (editorRef.current && editorRef.current.innerHTML === '' && value) {
+    if (editorRef.current && editorRef.current.innerHTML === "" && value) {
       editorRef.current.innerHTML = value;
       lastValueRef.current = value;
     }
@@ -56,14 +56,14 @@ export function RichTextarea({
       if (isUserTypingRef.current) {
         return;
       }
-      
+
       // Update content only if it's truly different
       if (editorRef.current.innerHTML !== value) {
         const wasEditorFocused = document.activeElement === editorRef.current;
-        
+
         editorRef.current.innerHTML = value;
         lastValueRef.current = value;
-        
+
         // Only restore focus and cursor if the editor was previously focused
         if (wasEditorFocused) {
           editorRef.current.focus();

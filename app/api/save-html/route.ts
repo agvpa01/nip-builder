@@ -159,17 +159,20 @@ function generateUSSupplementsHTML(productData: any): string {
         </table>
       </div>
       
-      ${textSections && textSections.length > 0 
-        ? textSections.map((section: any) => {
-            if (section.id === 'supplementaryInfo') {
-              return `<div class="mb-4"><div class="text-xs">${section.value}</div></div>`;
-            } else if (section.id === 'servingScoopInfo') {
-              return `<div><div class="text-xs font-bold">${section.value}</div></div>`;
-            } else {
-              return `<div class="mb-4"><h3 class="font-bold mb-2">${section.displayLabel}:</h3><div>${section.value}</div></div>`;
-            }
-          }).join('')
-        : `
+      ${
+        productData.textSections && productData.textSections.length > 0
+          ? productData.textSections
+              .map((section: any) => {
+                if (section.id === "supplementaryInfo") {
+                  return `<div class="mb-4"><div class="text-xs">${section.value}</div></div>`;
+                } else if (section.id === "servingScoopInfo") {
+                  return `<div><div class="text-xs font-bold">${section.value}</div></div>`;
+                } else {
+                  return `<div class="mb-4"><h3 class="font-bold mb-2">${section.displayLabel}:</h3><div>${section.value}</div></div>`;
+                }
+              })
+              .join("")
+          : `
           <div class="mb-4">
             <h3 class="font-bold mb-2">Directions:</h3>
             <div>${directions}</div>
@@ -238,11 +241,12 @@ function generateAUComplexHTML(productData: any): string {
     <div class="max-w-2xl mx-auto bg-white text-black p-8 font-sans text-sm leading-tight">
       <div class="grid gap-8 w-full grid-cols-1">
         <div class="w-full">
-          <div class="w-full">
-            <div class="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-sm">
+          <div class="border-2 border-black">
+            <div class="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-lg">
               NUTRITIONAL INFORMATION
             </div>
-            <table class="w-full border-collapse">
+            <div class="p-2">
+              <table class="w-full border-collapse">
               <tbody>
                 <tr style="border-bottom: ${thickBorderStyle}">
                   <td class="py-1 px-2">
@@ -290,14 +294,25 @@ function generateAUComplexHTML(productData: any): string {
                         .join("")
                     : ""
                 }
-                ${
-                  compositionalData
-                    ? `
+              </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          ${
+            compositionalData && Object.keys(compositionalData).length > 0
+              ? `
+          <div class="border-2 border-black w-full mt-6 relative">
+            <div class="p-2 pt-12">
+              <table class="w-full border-collapse">
+                <thead>
                   <tr>
-                    <td colspan="3" class="bg-black text-white text-center py-2 px-4 font-bold text-base">
+                    <th colspan="3" class="bg-black text-white text-center font-bold text-xl absolute top-0 left-0 right-0 m-0 p-2">
                       COMPOSITIONAL INFORMATION
-                    </td>
+                    </th>
                   </tr>
+                </thead>
+                <tbody>
                   ${Object.entries(compositionalData)
                     .map(
                       ([id, data]: [string, any]) => `
@@ -305,27 +320,33 @@ function generateAUComplexHTML(productData: any): string {
                       data.borderThickness
                     )}">
                       <td class="py-1 px-2">${data.name}</td>
-                      <td class="py-1 px-2 text-center">${data.serve}</td>
-                      <td class="py-1 px-2 text-center">${data.per100g}</td>
+                      <td class="py-1 px-2 text-right">${data.serve}</td>
+                      <td class="py-1 px-2 text-right">${data.per100g}</td>
                     </tr>
                   `
                     )
                     .join("")}
-                `
-                    : ""
-                }
-              </tbody>
-            </table>
+                </tbody>
+              </table>
+            </div>
           </div>
+          `
+              : ""
+          }
           <div class="space-y-4 mt-6 w-full">
-            ${textSections && textSections.length > 0 
-              ? textSections.map((section: any) => `
+            ${
+              textSections && textSections.length > 0
+                ? textSections
+                    .map(
+                      (section: any) => `
                 <div>
                   <h3 class="font-bold text-base mb-2">${section.displayLabel}:</h3>
                   <div class="text-sm">${section.value}</div>
                 </div>
-              `).join('')
-              : `
+              `
+                    )
+                    .join("")
+                : `
                 <div>
                   <h3 class="font-bold text-base mb-2">INGREDIENTS:</h3>
                   <div class="text-sm">${ingredients}</div>
@@ -343,17 +364,20 @@ function generateAUComplexHTML(productData: any): string {
         </div>
       </div>
       
-      ${textSections && textSections.length > 0 
-        ? textSections.map((section: any) => {
-            if (section.id === 'supplementaryInfo') {
-              return `<div class="mb-4"><div class="text-xs">${section.value}</div></div>`;
-            } else if (section.id === 'servingScoopInfo') {
-              return `<div><div class="text-xs font-bold">${section.value}</div></div>`;
-            } else {
-              return `<div class="mb-4"><h3 class="font-bold mb-2">${section.displayLabel}:</h3><div>${section.value}</div></div>`;
-            }
-          }).join('')
-        : `
+      ${
+        textSections && textSections.length > 0
+          ? textSections
+              .map((section: any) => {
+                if (section.id === "supplementaryInfo") {
+                  return `<div class="mb-4"><div class="text-xs">${section.value}</div></div>`;
+                } else if (section.id === "servingScoopInfo") {
+                  return `<div><div class="text-xs font-bold">${section.value}</div></div>`;
+                } else {
+                  return `<div class="mb-4"><h3 class="font-bold mb-2">${section.displayLabel}:</h3><div>${section.value}</div></div>`;
+                }
+              })
+              .join("")
+          : `
           <div class="mb-4">
             <h3 class="font-bold mb-2">Directions:</h3>
             <div>${directions}</div>
@@ -422,7 +446,7 @@ function generateUSProteinHTML(productData: any): string {
       <div class="grid gap-8 w-full grid-cols-1">
         <div class="w-full">
           <div class="w-full">
-            <div class="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-sm">
+            <div class="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-lg">
               NUTRITION FACTS
             </div>
             <table class="w-full border-collapse">
@@ -488,10 +512,12 @@ function generateUSProteinHTML(productData: any): string {
           Object.keys(aminoAcidData).length > 0
             ? `
           <div class="w-full">
-            <div class="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-sm">
-              TYPICAL AMINO ACID PROFILE
-            </div>
-            <table class="w-full border-collapse">
+            <div class="border-2 border-black">
+              <div class="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-lg">
+                TYPICAL AMINO ACID PROFILE
+              </div>
+              <div class="p-2">
+                <table class="w-full border-collapse">
               <tbody>
                 <tr style="border-bottom: 1px solid black">
                   <td class="py-1 px-2"></td>
@@ -516,7 +542,9 @@ function generateUSProteinHTML(productData: any): string {
                   )
                   .join("")}
               </tbody>
-            </table>
+                </table>
+              </div>
+            </div>
           </div>
         `
             : ""
@@ -589,7 +617,7 @@ function generateUSComplexHTML(productData: any): string {
       <div class="grid gap-8 w-full grid-cols-1">
         <div class="w-full">
           <div class="w-full">
-            <div class="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-sm">
+            <div class="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-lg">
               SUPPLEMENT FACTS
             </div>
             <table class="w-full border-collapse">
@@ -654,36 +682,33 @@ function generateUSComplexHTML(productData: any): string {
           compositionalData &&
           Object.keys(compositionalData).length > 0
             ? `
-          <div class="w-full">
-            <div class="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-sm">
-              COMPOSITIONAL INFORMATION
-            </div>
-            <table class="w-full border-collapse">
-              <tbody>
-                <tr style="border-bottom: 1px solid black">
-                  <td class="py-1 px-2"></td>
-                  <td class="py-1 px-2 font-normal text-xs text-center">
-                    Per Serve
-                  </td>
-                </tr>
-                ${Object.entries(compositionalData)
-                  .map(
-                    ([key, data]: [string, any]) => `
-                  <tr style="border-bottom: ${getBorderThickness(
-                    data.borderThickness
-                  )}">
-                    <td class="py-1 px-2">
-                      ${key}
-                    </td>
-                    <td class="py-1 px-2 text-center">
-                      ${data.value}
-                    </td>
+          <div class="border-2 border-black w-full mt-6 relative">
+            <div class="p-2 pt-12">
+              <table class="w-full border-collapse">
+                <thead>
+                  <tr>
+                    <th colspan="3" class="bg-black text-white text-center font-bold text-xl absolute top-0 left-0 right-0 m-0 p-2">
+                      COMPOSITIONAL INFORMATION
+                    </th>
                   </tr>
-                `
-                  )
-                  .join("")}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  ${Object.entries(compositionalData)
+                    .map(
+                      ([id, data]: [string, any]) => `
+                    <tr style="border-bottom: ${getBorderThickness(
+                      data.borderThickness
+                    )}">
+                      <td class="py-1 px-2">${data.name}</td>
+                      <td class="py-1 px-2 text-right">${data.serve}</td>
+                      <td class="py-1 px-2 text-right">${data.per100g}</td>
+                    </tr>
+                  `
+                    )
+                    .join("")}
+                </tbody>
+              </table>
+            </div>
           </div>
         `
             : ""
@@ -778,14 +803,19 @@ function generateAUProteinHTML(productData: any): string {
     <div class="max-w-2xl mx-auto bg-white text-black p-8 font-sans text-sm leading-tight">
       <div class="grid gap-8 w-full grid-cols-1 lg:grid-cols-2">
         <div class="space-y-4 w-full">
-          ${textSections && textSections.length > 0 
-            ? textSections.map((section: any) => `
+          ${
+            textSections && textSections.length > 0
+              ? textSections
+                  .map(
+                    (section: any) => `
               <div>
                 <h3 class="font-bold text-base mb-2">${section.displayLabel}:</h3>
                 <div>${section.value}</div>
               </div>
-            `).join('')
-            : `
+            `
+                  )
+                  .join("")
+              : `
               <div>
                 <h3 class="font-bold text-base mb-2">DIRECTIONS:</h3>
                 <div>${directions}</div>
@@ -818,11 +848,12 @@ function generateAUProteinHTML(productData: any): string {
           }
         </div>
         <div class="w-full">
-          <div class="w-full">
-            <div class="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-sm">
+          <div class="border-2 border-black">
+            <div class="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-lg">
               NUTRITIONAL INFORMATION
             </div>
-            <table class="w-full border-collapse">
+            <div class="p-2">
+              <table class="w-full border-collapse">
               <tbody>
                 <tr style="border-bottom: ${thickBorderStyle}">
                   <td class="py-1 px-2">
@@ -872,15 +903,18 @@ function generateAUProteinHTML(productData: any): string {
                 }
               </tbody>
             </table>
+            </div>
           </div>
           <div class="mt-6 w-full">
-            <div class="bg-black text-white text-center py-2 px-4 font-bold text-base">
-              TYPICAL AMINO ACID PROFILE
-            </div>
-            <div class="text-right py-1 font-semibold" style="border-bottom: ${thickBorderStyle}">
-              Per 100g of Protein
-            </div>
-            <table class="w-full border-collapse">
+            <div class="border-2 border-black">
+              <div class="bg-black text-white text-center py-2 px-4 font-bold text-xl">
+                TYPICAL AMINO ACID PROFILE
+              </div>
+              <div class="p-2">
+                <div class="text-right py-1 font-semibold" style="border-bottom: ${thickBorderStyle}">
+                  Per 100g of Protein
+                </div>
+                <table class="w-full border-collapse">
               <tbody>
                 ${
                   aminoAcidData
@@ -906,6 +940,7 @@ function generateAUProteinHTML(productData: any): string {
                 </tr>
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       </div>
@@ -973,11 +1008,12 @@ function generateAUSupplementsHTML(productData: any): string {
     <div class="max-w-2xl mx-auto bg-white text-black p-8 font-sans text-sm leading-tight">
       <div class="grid gap-8 w-full grid-cols-1">
         <div class="w-full">
-          <div class="w-full">
-            <div class="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-sm">
+          <div class="border-2 border-black">
+            <div class="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-lg">
               NUTRITIONAL INFORMATION
             </div>
-            <table class="w-full border-collapse">
+            <div class="p-2">
+              <table class="w-full border-collapse">
               <tbody>
                 <tr style="border-bottom: ${thickBorderStyle}">
                   <td class="py-1 px-2">
@@ -1095,7 +1131,7 @@ function generateUSDefaultHTML(productData: any): string {
       <div class="grid gap-8 w-full grid-cols-1">
         <div class="w-full">
           <div class="w-full">
-            <div class="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-sm">
+            <div class="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-lg">
               NUTRITION FACTS
             </div>
             <table class="w-full border-collapse">
@@ -1220,8 +1256,8 @@ function generateAUDefaultHTML(productData: any): string {
     <div class="max-w-2xl mx-auto bg-white text-black p-8 font-sans text-sm leading-tight">
       <div class="grid gap-8 w-full grid-cols-1">
         <div class="w-full">
-          <div class="w-full">
-            <div class="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-sm">
+          <div class="border-2 border-black">
+            <div class="bg-black text-white text-center py-2 px-4 font-bold tracking-widest text-lg">
               NUTRITIONAL INFORMATION
             </div>
             <table class="w-full border-collapse">
@@ -1325,7 +1361,7 @@ function generateDefaultHTML(productData: any): string {
   return `
     <div class="max-w-2xl mx-auto bg-white text-black p-8 font-sans text-sm leading-tight">
       <div class="border-2 border-black mb-4">
-        <h2 class="bg-black text-white p-2 text-center font-bold">NUTRITION INFORMATION</h2>
+        <h2 class="bg-black text-white p-2 text-center font-bold text-lg">NUTRITION INFORMATION</h2>
         <div class="p-4">
           <div class="mb-2">
             <span class="font-bold">Serving Size:</span> ${servingSize}
