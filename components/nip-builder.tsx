@@ -795,89 +795,94 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Text Sections */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Text Sections</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="directions">Directions</Label>
-              <RichTextarea
-                id="directions"
-                value={directions}
-                onChange={setDirections}
-                rows={3}
-                placeholder="Enter directions with formatting..."
-              />
-            </div>
+      <div className={`grid grid-cols-1 gap-6 ${template !== "supplements" ? "lg:grid-cols-2" : "lg:grid-cols-1"}`}>
+        {/* Text Sections - Hidden for supplements template */}
+        {template !== "supplements" && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Text Sections</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {template === "protein" && (
+                <>
+                  <div>
+                    <Label htmlFor="directions">Directions</Label>
+                    <RichTextarea
+                      id="directions"
+                      value={directions}
+                      onChange={setDirections}
+                      rows={3}
+                      placeholder="Enter directions with formatting..."
+                    />
+                  </div>
 
-            <div>
-              <Label htmlFor="serving-size">Serving Size</Label>
-              <RichTextarea
-                id="serving-size"
-                value={servingSize}
-                onChange={setServingSize}
-                rows={1}
-                placeholder="Enter serving size with formatting..."
-              />
-            </div>
+                  <div>
+                    <Label htmlFor="serving-size">Serving Size</Label>
+                    <RichTextarea
+                      id="serving-size"
+                      value={servingSize}
+                      onChange={setServingSize}
+                      rows={1}
+                      placeholder="Enter serving size with formatting..."
+                    />
+                  </div>
 
-            <div>
-              <Label htmlFor="ingredients">Ingredients</Label>
-              <RichTextarea
-                id="ingredients"
-                value={ingredients}
-                onChange={setIngredients}
-                rows={3}
-                placeholder="Enter ingredients with formatting..."
-              />
-            </div>
+                  <div>
+                    <Label htmlFor="allergen">Allergen Advice</Label>
+                    <RichTextarea
+                      id="allergen"
+                      value={allergenAdvice}
+                      onChange={setAllergenAdvice}
+                      rows={2}
+                      placeholder="Enter allergen advice with formatting..."
+                    />
+                  </div>
 
-            <div>
-              <Label htmlFor="allergen">Allergen Advice</Label>
-              <RichTextarea
-                id="allergen"
-                value={allergenAdvice}
-                onChange={setAllergenAdvice}
-                rows={2}
-                placeholder="Enter allergen advice with formatting..."
-              />
-            </div>
+                  <div>
+                    <Label htmlFor="storage">Storage</Label>
+                    <RichTextarea
+                      id="storage"
+                      value={storage}
+                      onChange={setStorage}
+                      rows={3}
+                      placeholder="Enter storage instructions with formatting..."
+                    />
+                  </div>
 
-            <div>
-              <Label htmlFor="storage">Storage</Label>
-              <RichTextarea
-                id="storage"
-                value={storage}
-                onChange={setStorage}
-                rows={3}
-                placeholder="Enter storage instructions with formatting..."
-              />
-            </div>
+                  <div>
+                    <Label htmlFor="supplementary">Supplementary Info</Label>
+                    <RichTextarea
+                      id="supplementary"
+                      value={supplementaryInfo}
+                      onChange={setSupplementaryInfo}
+                      rows={4}
+                      placeholder="Enter supplementary information with formatting..."
+                    />
+                  </div>
 
-            <div>
-              <Label htmlFor="supplementary">Supplementary Info</Label>
-              <RichTextarea
-                id="supplementary"
-                value={supplementaryInfo}
-                onChange={setSupplementaryInfo}
-                rows={4}
-                placeholder="Enter supplementary information with formatting..."
-              />
-            </div>
+                  <div>
+                    <Label htmlFor="serving-scoop">Serving Scoop Info</Label>
+                    <RichTextarea
+                      id="serving-scoop"
+                      value={servingScoopInfo}
+                      onChange={setServingScoopInfo}
+                      rows={3}
+                      placeholder="Enter serving scoop information with formatting..."
+                    />
+                  </div>
+                </>
+              )}
 
-            <div>
-              <Label htmlFor="serving-scoop">Serving Scoop Info</Label>
-              <RichTextarea
-                id="serving-scoop"
-                value={servingScoopInfo}
-                onChange={setServingScoopInfo}
-                rows={3}
-                placeholder="Enter serving scoop information with formatting..."
-              />
-            </div>
+              <div>
+                <Label htmlFor="ingredients">Ingredients</Label>
+                <RichTextarea
+                  id="ingredients"
+                  value={ingredients}
+                  onChange={setIngredients}
+                  rows={3}
+                  placeholder="Enter ingredients with formatting..."
+                />
+              </div>
 
             {template === "complex" && (
               <div>
@@ -893,6 +898,7 @@ export function NipBuilder({ product, template }: NipBuilderProps) {
             )}
           </CardContent>
         </Card>
+        )}
 
         {/* Nutritional Information */}
         <Card>
